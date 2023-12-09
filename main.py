@@ -5,7 +5,7 @@ from src.llm import LLMPaperReader
 import datetime
 import os
 import gzip
-import sys
+import pprint
 
 if __name__ == "__main__":
     # Load config
@@ -55,14 +55,25 @@ if __name__ == "__main__":
                 papers_already_read.add(paper["id"])
 
     with open(os.path.join(temp_data_dir, f"{date}.resp.json"), "a") as f:
+        count = 0
         for paper in merged_paper_list.values():
-            print(f"Reading paper: {paper['title']}, {paper['url']}")
+            print("--" * 10)
+            print(
+                f"Reading paper: {count+1} / {len(merged_paper_list)}:  {paper['title']} \n"
+            )
             if paper["id"] in papers_already_read:
                 print("Already read, skiping...")
                 continue
             judgement = reader.read_paper(paper)
-            judgement["id"] = paper["id"]
-            f.write(json.dumps(judgement) + "\n")
+            pprint.pprint(judgement)
+            print("\n")
+            print("--" * 10)
+            output = {
+                "id": paper["id"],
+                "judgement": judgement,
+            }
+            f.write(json.dumps(output) + "\n")
+            count += 1
             # try:
 
             # except Exception as e:
