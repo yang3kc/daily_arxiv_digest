@@ -13,16 +13,25 @@ class LLMPaperReader:
         Title: {title}
         Abstract: {abstract}
         --------------
-        Based on the title and abstract, please decide if the paper pertains to one or multiple topics below:
+        Based on the title and abstract, please rate the direct relevance (title and abstract must mention the topics, do not assume) of the paper with the following topics:
         --------------
         {topics}
         --------------
-        If the paper is VERY relevant to a topic, provide a short explanation of why. If the the paper is not relevant to any of the topics, reply False and leave the reason empty. The output should be in JSON format and follow the following schema:
+        For each topic, rate the relevance as a number between 0 and 1, where 0 means not relevant and 1 means very relevant.
+        If the paper is relevant to the topic, provide a short explanation. Otherwise, leave the explanation empty.
+        Use your best guess when you are not sure.
+        The output should be in JSON format and follow the following schema:
         --------------
         ```json
         {{
-            'paper_is_relevant': True,
-            'reason': 'The paper is relevant to topic xx because ....'
+            'topic 1': {{
+                'relevance': 0,
+                'reason': ''
+            }},
+            'topic 2': {{
+                'relevance': 0.9,
+                'reason': 'The paper ....'
+            }}
         }}
          ```
     """
