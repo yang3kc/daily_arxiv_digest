@@ -1,9 +1,17 @@
 {
-    "arxiv_subject": [
-        "cs.CY"
+    "arxiv_rss_base_url": "http://arxiv.org/rss/",
+    "arxiv_subjects": [
+        "cs.CY",
+        "cs.CL",
+        "cs.SI"
     ],
-    "interested_topic": [
-        "Review of existing research",
-        "Security of AI and langauge models"
-    ]
+    "topics": [
+        "Security of AI and language models",
+        "Applications of AI and language models in social science research",
+        "Using AI to simulate humans in various contexts",
+        "Methods to increase the factuality of language model response",
+        "AI and language models for generating misinformation or fact-checking"
+
+    ],
+    "openai_model": "gpt-3.5-turbo-1106"
 }
