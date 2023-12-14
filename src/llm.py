@@ -13,12 +13,13 @@ class LLMPaperReader:
         Title: {title}
         Abstract: {abstract}
         --------------
-        Based on the title and abstract, please rate the direct relevance (title and abstract must mention the topics, do not assume) of the paper with the following topics:
+        Based on the title and abstract, please rate the direct relevance of the paper with the following topics:
         --------------
         {topics}
         --------------
         For each topic, rate the relevance as a number between 0 and 1, where 0 means not relevant and 1 means very relevant.
-        If the paper is relevant to the topic, provide a short explanation. Otherwise, leave the explanation empty.
+        The paper MUST directly mention the topics to be relevant, indirect relations and potential implications DO NOT count.
+        If the paper is relevant to the topic, provide a short explanation; otherwise, leave the explanation empty.
         Use your best guess when you are not sure.
         The output should be in JSON format and follow the following schema:
         --------------
