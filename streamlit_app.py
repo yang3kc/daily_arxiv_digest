@@ -15,69 +15,98 @@ if __name__ == "__main__":
     date = datetime.datetime.now().strftime("%Y-%m-%d")
     temp_data_dir = "./data"
 
-    # Load paper information
-    paper_file = os.path.join(temp_data_dir, f"{date}.json.gz")
-    with gzip.open(paper_file, "rb") as f:
-        merged_paper_list = json.loads(f.read().decode("utf-8"))
-    paper_df = pd.DataFrame.from_dict(merged_paper_list.values())
-
     # Load judgement
     judgement_file = os.path.join(temp_data_dir, f"{date}.resp.json")
-    juedement_list = []
+    judgement_results = {}
     with open(judgement_file) as f:
         for line in f:
             paper = json.loads(line)
-            juedement_list.append(paper)
+            judgement_results[paper["id"]] = paper["judgement"]
 
-    paper_worth_reading = []
-    for judgement in juedement_list:
-        paper_id = judgement["id"]
-        score_reason = []
-        for topic, value in judgement["judgement"].items():
-            if value["relevance"] > 0.8:
-                score_reason.append(
-                    f"<{value['relevance']}> - <{topic}>: {value['reason']}"
-                )
-        if score_reason:
-            paper = {"id": judgement["id"], "reason": " || ".join(score_reason)}
-            paper_worth_reading.append(paper)
+    # Load paper information
+    paper_file = os.path.join(temp_data_dir, f"{date}.json.gz")
+    with gzip.open(paper_file, "rb") as f:
+        paper_dict = json.loads(f.read().decode("utf-8"))
 
-    paper_worth_reading_df = pd.DataFrame.from_dict(paper_worth_reading)
+    # Combine the paper info and judgement
+    for paper_id in paper_dict.keys():
+        paper_judgement = judgement_results[paper_id]
+        paper_dict[paper_id]["judgement"] = paper_judgement
+        paper_dict[paper_id]["title"] = remove_parentheses_content(
+            paper_dict[paper_id]["title"]
+        )
 
-    merged_df = pd.merge(paper_df, paper_worth_reading_df, on="id")
-    other_papers_df = paper_df[~paper_df["id"].isin(merged_df["id"])]
-    reason_other_papers = []
-    for index, col in other_papers_df.iterrows():
-        for judgement in juedement_list:
-            if col["id"] == judgement["id"]:
-                score_reason = []
-                for topic, value in judgement["judgement"].items():
-                    score_reason.append(
-                        f"<{value['relevance']}> - <{topic}>: {value['reason']}"
-                    )
-                reason_other_papers.append(" || ".join(score_reason))
-    other_papers_df["reason"] = reason_other_papers
+    relevance_threshold = 0.8
+
+    # Find relevant papers
+    relevant_papers = {}
+    relevant_paper_ids = set()
+    for id, paper_info in paper_dict.items():
+        for topic, relevance in paper_info["judgement"].items():
+            if relevance["relevance"] > relevance_threshold:
+                relevant_paper_ids.add(id)
+                temp_obj = {"paper_id": id, "relevance": relevance}
+                if topic in relevant_papers:
+                    relevant_papers[topic].append(temp_obj)
+                else:
+                    relevant_papers[topic] = [temp_obj]
 
     st.title(f"Arxiv paper digest on {date}")
-    tab1, tab2 = st.tabs(
+    relevant_paper_tab, irrelevant_paper_tab = st.tabs(
         [
-            f"Paper Worth Reading ({len(merged_df)})",
-            f"Paper Not Worth Reading ({len(other_papers_df)})",
+            f"Relevant papers ({len(relevant_paper_ids)})",
+            f"Irrelevant papers ({len(paper_dict) - len(relevant_paper_ids)})",
         ]
     )
-    for tab, df in zip([tab1, tab2], [merged_df, other_papers_df]):
-        with tab:
-            for index, col in df.iterrows():
-                st.markdown(
-                    f"### [{remove_parentheses_content(col['title'])}]({col['url']})"
-                )
-                reasons = col["reason"].split(" || ")
-                for reason in reasons:
-                    st.markdown(reason)
-                st.markdown(f"{col['authors']}")
 
+    with relevant_paper_tab:
+        for topic, papers in relevant_papers.items():
+            st.markdown(f"# {topic}")
+            for paper in papers:
+                paper_title = paper_dict[paper["paper_id"]]["title"]
+                paper_url = paper_dict[paper["paper_id"]]["url"]
+                st.markdown(f"### [{paper_title}]({paper_url})")
+                st.markdown(
+                    f"{paper['relevance']['relevance']} || {paper['relevance']['reason']}"
+                )
+                st.markdown(f"{', '.join(paper_dict[paper['paper_id']]['authors'])}")
                 with st.expander("Abstract"):
-                    st.markdown(col["abstract"])
+                    st.markdown(paper_dict[paper["paper_id"]]["abstract"])
+
+    with irrelevant_paper_tab:
+        for id, paper_info in paper_dict.items():
+            if id not in relevant_paper_ids:
+                paper_title = paper_info["title"]
+                paper_url = paper_info["url"]
+                st.markdown(f"### [{paper_title}]({paper_url})")
+                for topic, relevance in paper_info["judgement"].items():
+                    if relevance["relevance"] > 0:
+                        st.markdown(
+                            f"{relevance['relevance']} || {topic} || {relevance['reason']}"
+                        )
+                st.markdown(f"{', '.join(paper_info['authors'])}")
+                with st.expander("Abstract"):
+                    st.markdown(paper_info["abstract"])
+
+    # tab1, tab2 = st.tabs(
+    #     [
+    #         f"Paper Worth Reading ({len(merged_df)})",
+    #         f"Paper Not Worth Reading ({len(other_papers_df)})",
+    #     ]
+    # )
+    # for tab, df in zip([tab1, tab2], [merged_df, other_papers_df]):
+    #     with tab:
+    #         for index, col in df.iterrows():
+    #             st.markdown(
+    #                 f"### [{remove_parentheses_content(col['title'])}]({col['url']})"
+    #             )
+    #             reasons = col["reason"].split(" || ")
+    #             for reason in reasons:
+    #                 st.markdown(reason)
+    #             st.markdown(f"{col['authors']}")
+
+    #             with st.expander("Abstract"):
+    #                 st.markdown(col["abstract"])
 
     # with tab2:
     #     st.markdown(f"# Paper Not Worth Reading for {date}")
