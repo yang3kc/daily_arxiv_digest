@@ -2,8 +2,7 @@
     "arxiv_rss_base_url": "http://arxiv.org/rss/",
     "arxiv_subjects": [
         "cs.CY",
-        "cs.CL",
-        "cs.SI"
+        "cs.CL"
     ],
     "topics": [
         "Security of AI and language models",
