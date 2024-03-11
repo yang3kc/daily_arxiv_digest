@@ -7,13 +7,25 @@ import os
 import re
 
 
+temp_data_dir = "./data"
+
+
 def remove_parentheses_content(s):
     return re.sub(r"\([^)]*\)", "", s)
 
 
+def load_latest_date():
+    list_of_files = os.listdir(temp_data_dir)
+    file_date_list = []
+    for file in list_of_files:
+        if file.endswith(".json"):
+            date = file.split(".")[0]
+            file_date_list.append(date)
+    return max(file_date_list)
+
+
 if __name__ == "__main__":
-    date = datetime.datetime.now().strftime("%Y-%m-%d")
-    temp_data_dir = "./data"
+    date = load_latest_date()
 
     # Load judgement
     judgement_file = os.path.join(temp_data_dir, f"{date}.resp.json")
