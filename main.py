@@ -63,6 +63,7 @@ if __name__ == "__main__":
             )
             if paper["id"] in papers_already_read:
                 print("Already read, skiping...")
+                count += 1
                 continue
             judgement = reader.read_paper(paper)
             pprint.pprint(judgement)
