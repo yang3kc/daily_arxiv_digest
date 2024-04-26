@@ -1,4 +1,5 @@
-from openai import OpenAI
+from openai import AsyncOpenAI
+import asyncio
 import json
 
 
@@ -40,16 +41,23 @@ class LLMPaperReader:
     def __init__(self, model, topics):
         self.model = model
         self.topics = topics
-        self.client = OpenAI()
+        self.client = AsyncOpenAI()
 
-    def read_paper(self, paper):
-        response = self._call_api(paper)
+    async def read_paper(self, paper):
+        print(f"Reading paper: [[{paper['title']}]]")
+        response = await self._call_api(paper)
         response_content = response.choices[0].message.content
         response_json = json.loads(response_content)
-        return response_json
+        judgement = {"id": paper["id"], "judgement": response_json}
+        print(f"Done reading paper: [[{paper['title']}]]")
+        return judgement
 
-    def _call_api(self, paper):
-        response = self.client.chat.completions.create(
+    async def read_papers(self, papers):
+        responses = await asyncio.gather(*[self.read_paper(paper) for paper in papers])
+        return responses
+
+    async def _call_api(self, paper):
+        response = await self.client.chat.completions.create(
             model=self.model,
             response_format={"type": "json_object"},
             messages=[
