@@ -2,6 +2,7 @@ import json
 from src.rss import ArxivRSS
 from src.utils import merge_dicts
 from src.llm import LLMPaperReader
+import asyncio
 import datetime
 import os
 import gzip
@@ -54,30 +55,18 @@ if __name__ == "__main__":
                 paper = json.loads(line)
                 papers_already_read.add(paper["id"])
 
+    papers_to_read = []
+    for paper in merged_paper_list.values():
+        if paper["id"] not in papers_already_read:
+            papers_to_read.append(paper)
+    print(f"Found {len(papers_to_read)} papers to read...")
+
+    judgement_list = asyncio.run(reader.read_papers(papers_to_read))
+
     with open(os.path.join(temp_data_dir, f"{date}.resp.json"), "a") as f:
-        count = 0
-        for paper in merged_paper_list.values():
-            print("--" * 10)
-            print(
-                f"Reading paper: {count+1} / {len(merged_paper_list)}:  {paper['title']} \n"
-            )
-            if paper["id"] in papers_already_read:
-                print("Already read, skiping...")
-                count += 1
-                continue
-            judgement = reader.read_paper(paper)
-            pprint.pprint(judgement)
-            print("\n")
-            print("--" * 10)
+        for judgement in judgement_list:
             output = {
-                "id": paper["id"],
-                "judgement": judgement,
+                "id": judgement["id"],
+                "judgement": judgement["judgement"],
             }
             f.write(json.dumps(output) + "\n")
-            count += 1
-            # try:
-
-            # except Exception as e:
-            #     print(f"Error: {e}")
-            # except KeyboardInterrupt:
-            #     sys.exit(0)
