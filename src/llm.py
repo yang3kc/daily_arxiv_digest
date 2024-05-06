@@ -43,6 +43,20 @@ class LLMPaperReader:
         self.topics = topics
         self.client = AsyncOpenAI()
 
+    # The code is borrowed from https://gist.github.com/benfasoli/650a57923ab1951e1cb6355f033cbc8b
+    def _limit_concurrency(self, tasks, number_of_concurrent_tasks):
+        """
+        Decorate coroutines to limit concurrency.
+        Enforces a limit on the number of coroutines that can run concurrently in higher level asyncio-compatible concurrency managers like asyncio.gather(coroutines)
+        """
+        semaphore = asyncio.Semaphore(number_of_concurrent_tasks)
+
+        async def with_concurrency_limit(task):
+            async with semaphore:
+                return await task
+
+        return [with_concurrency_limit(task) for task in tasks]
+
     async def read_paper(self, paper):
         print(f"Reading paper: [[{paper['title']}]]")
         response = await self._call_api(paper)
@@ -52,8 +66,11 @@ class LLMPaperReader:
         print(f"Done reading paper: [[{paper['title']}]]")
         return judgement
 
-    async def read_papers(self, papers):
-        responses = await asyncio.gather(*[self.read_paper(paper) for paper in papers])
+    async def read_papers(self, papers, number_of_concurrent_tasks=10):
+        tasks = [self.read_paper(paper) for paper in papers]
+        responses = await asyncio.gather(
+            *self._limit_concurrency(tasks, number_of_concurrent_tasks)
+        )
         return responses
 
     async def _call_api(self, paper):
