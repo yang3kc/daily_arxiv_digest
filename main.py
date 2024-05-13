@@ -61,7 +61,12 @@ if __name__ == "__main__":
             papers_to_read.append(paper)
     print(f"Found {len(papers_to_read)} papers to read...")
 
-    judgement_list = asyncio.run(reader.read_papers(papers_to_read))
+    judgement_list = asyncio.run(
+        reader.read_papers(
+            papers_to_read,
+            number_of_concurrent_tasks=config["number_of_concurrent_tasks"],
+        )
+    )
 
     with open(os.path.join(temp_data_dir, f"{date}.resp.json"), "a") as f:
         for judgement in judgement_list:
