@@ -69,7 +69,8 @@ class LLMPaperReader:
     async def read_papers(self, papers, number_of_concurrent_tasks=10):
         tasks = [self.read_paper(paper) for paper in papers]
         responses = await asyncio.gather(
-            *self._limit_concurrency(tasks, number_of_concurrent_tasks)
+            *self._limit_concurrency(tasks, number_of_concurrent_tasks),
+            return_exceptions=True,
         )
         return responses
 

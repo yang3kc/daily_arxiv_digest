@@ -67,9 +67,14 @@ if __name__ == "__main__":
             number_of_concurrent_tasks=config["number_of_concurrent_tasks"],
         )
     )
+    success_judgement_list = []
+    for judgement in judgement_list:
+        if not isinstance(judgement, Exception):
+            success_judgement_list.append(judgement)
+    print(f"Read {len(success_judgement_list)} out of {len(judgement_list)} papers...")
 
     with open(os.path.join(temp_data_dir, f"{date}.resp.json"), "a") as f:
-        for judgement in judgement_list:
+        for judgement in success_judgement_list:
             output = {
                 "id": judgement["id"],
                 "judgement": judgement["judgement"],
