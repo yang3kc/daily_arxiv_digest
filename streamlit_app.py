@@ -48,7 +48,7 @@ if __name__ == "__main__":
             paper_dict[paper_id]["title"]
         )
 
-    relevance_threshold = 0.8
+    relevance_threshold = 0.7
 
     # Find relevant papers
     relevant_papers = {}
