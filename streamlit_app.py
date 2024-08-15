@@ -55,7 +55,10 @@ if __name__ == "__main__":
     relevant_paper_ids = set()
     for id, paper_info in paper_dict.items():
         for topic, relevance in paper_info["judgement"].items():
-            if relevance["relevance"] > relevance_threshold:
+            if (
+                isinstance(relevance, dict)
+                and relevance["relevance"] > relevance_threshold
+            ):
                 relevant_paper_ids.add(id)
                 temp_obj = {"paper_id": id, "relevance": relevance}
                 if topic in relevant_papers:
