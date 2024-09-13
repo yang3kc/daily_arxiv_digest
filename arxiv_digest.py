@@ -1,7 +1,5 @@
 import streamlit as st
-import pandas as pd
 import json
-import time
 from src.rss import ArxivRSS
 from src.utils import merge_dicts
 from src.llm import LLMPaperReader
@@ -21,7 +19,6 @@ def display_papers(topic, paper_list):
         with st.expander("Abstract"):
             st.markdown(arxiv_paper["abstract"])
         if "judgement" in arxiv_paper:
-            st.markdown(arxiv_paper["judgement"])
             with st.expander("Judgement"):
                 for topic, relevance in arxiv_paper["judgement"].items():
                     if relevance["relevance"] > 0:
@@ -51,13 +48,7 @@ def fetch_arxiv_papers(config):
         info_text = f"✅ Done obtaining {len(merged_paper_list)} papers"
         st.write(info_text)
         status.update(label=info_text, state="complete", expanded=False)
-    temp_merged_paper_list = {}
-    for paper_id, paper in merged_paper_list.items():
-        temp_merged_paper_list[paper_id] = paper
-        if len(temp_merged_paper_list) > 5:
-            break
-    return temp_merged_paper_list
-    # return merged_paper_list
+    return merged_paper_list
 
 
 def classify_papers(paper_list):
@@ -109,8 +100,6 @@ st.sidebar.title("arXiv digest")
 if st.sidebar.button("Fetch new papers"):
     st.session_state["arxiv_papers"] = fetch_arxiv_papers(config)
 
-progress_text = "LLM reading papers in progress. Please wait."
-llm_reading_progress = st.progress(0, text=progress_text)
 
 if st.sidebar.button("Read papers"):
     llm_read_papers(st.session_state["arxiv_papers"])

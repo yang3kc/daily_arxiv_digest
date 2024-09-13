@@ -1,6 +1,7 @@
 from openai import AsyncOpenAI
 import asyncio
 import json
+import streamlit as st
 
 
 class LLMPaperReader:
@@ -68,10 +69,30 @@ class LLMPaperReader:
 
     async def read_papers(self, papers, number_of_concurrent_tasks=10):
         tasks = [self.read_paper(paper) for paper in papers]
-        responses = await asyncio.gather(
-            *self._limit_concurrency(tasks, number_of_concurrent_tasks),
-            return_exceptions=True,
+        total_papers = len(papers)
+
+        # Create a Streamlit progress bar
+        progress_bar = st.progress(0)
+        progress_text = st.empty()
+
+        async def process_paper(task, index):
+            result = await task
+            # Update progress bar and text
+            progress = (index + 1) / total_papers
+            progress_bar.progress(progress)
+            progress_text.text(f"Processed {index + 1}/{total_papers} papers")
+            return result
+
+        limited_tasks = self._limit_concurrency(
+            [process_paper(task, i) for i, task in enumerate(tasks)],
+            number_of_concurrent_tasks,
         )
+
+        responses = await asyncio.gather(*limited_tasks, return_exceptions=True)
+
+        # Clear the progress text
+        progress_text.empty()
+
         return responses
 
     async def _call_api(self, paper):
