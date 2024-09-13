@@ -4,6 +4,8 @@ import json
 import time
 from src.rss import ArxivRSS
 from src.utils import merge_dicts
+from src.llm import LLMPaperReader
+import asyncio
 
 # Load config
 with open("./config.json") as f:
@@ -49,13 +51,13 @@ def fetch_arxiv_papers(config):
         info_text = f"✅ Done obtaining {len(merged_paper_list)} papers"
         st.write(info_text)
         status.update(label=info_text, state="complete", expanded=False)
-    # temp_merged_paper_list = {}
-    # for paper_id, paper in merged_paper_list.items():
-    #     temp_merged_paper_list[paper_id] = paper
-    #     if len(temp_merged_paper_list) > 5:
-    #         break
-    # return temp_merged_paper_list
-    return merged_paper_list
+    temp_merged_paper_list = {}
+    for paper_id, paper in merged_paper_list.items():
+        temp_merged_paper_list[paper_id] = paper
+        if len(temp_merged_paper_list) > 5:
+            break
+    return temp_merged_paper_list
+    # return merged_paper_list
 
 
 def classify_papers(paper_list):
@@ -72,14 +74,27 @@ def classify_papers(paper_list):
 
 
 def llm_read_papers(paper_list):
-    with st.status("Reading papers", expanded=False) as status:
-        with open("./data/2024-09-13.resp.json") as f:
-            judgement_results = {}
-            for line in f:
-                paper = json.loads(line)
-                judgement_results[paper["id"]] = paper["judgement"]
-        info_text = f"🔄 Read {len(judgement_results)} papers"
-        status.update(label=info_text, state="running")
+    llm_reader = LLMPaperReader(config["openai_model"], config["topics"])
+    papers_to_read = []
+    for paper_id, paper in paper_list.items():
+        if "judgement" not in paper:
+            papers_to_read.append(paper)
+
+    judgement_list = asyncio.run(
+        llm_reader.read_papers(
+            papers_to_read,
+            number_of_concurrent_tasks=config["number_of_concurrent_tasks"],
+        )
+    )
+    success_judgement_list = []
+    for judgement in judgement_list:
+        if not isinstance(judgement, Exception):
+            success_judgement_list.append(judgement)
+    print(f"Read {len(success_judgement_list)} out of {len(judgement_list)} papers...")
+
+    judgement_results = {}
+    for judgement in success_judgement_list:
+        judgement_results[judgement["id"]] = judgement["judgement"]
 
     for paper_id in paper_list.keys():
         paper_judgement = judgement_results[paper_id]
@@ -93,6 +108,9 @@ st.sidebar.title("arXiv digest")
 
 if st.sidebar.button("Fetch new papers"):
     st.session_state["arxiv_papers"] = fetch_arxiv_papers(config)
+
+progress_text = "LLM reading papers in progress. Please wait."
+llm_reading_progress = st.progress(0, text=progress_text)
 
 if st.sidebar.button("Read papers"):
     llm_read_papers(st.session_state["arxiv_papers"])
