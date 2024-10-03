@@ -60,7 +60,7 @@ def classify_papers(paper_list):
                 if topic not in papers_by_topics:
                     papers_by_topics[topic] = []
                 papers_by_topics[topic].append(paper)
-                print(papers_by_topics[topic])
+                # print(papers_by_topics[topic])
     st.session_state["papers_by_topics"] = papers_by_topics
 
 
