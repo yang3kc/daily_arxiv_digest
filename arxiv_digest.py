@@ -87,11 +87,14 @@ def llm_read_papers(paper_list):
     for judgement in success_judgement_list:
         judgement_results[judgement["id"]] = judgement["judgement"]
 
+    paper_with_judgement = {}
     for paper_id in paper_list.keys():
-        paper_judgement = judgement_results[paper_id]
-        paper_list[paper_id]["judgement"] = paper_judgement
+        if paper_id in judgement_results:
+            paper_judgement = judgement_results[paper_id]
+            paper_with_judgement[paper_id] = paper_list[paper_id]
+            paper_with_judgement[paper_id]["judgement"] = paper_judgement
 
-    classify_papers(paper_list)
+    classify_papers(paper_with_judgement)
 
 
 # Sidebar
