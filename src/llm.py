@@ -70,17 +70,24 @@ class LLMPaperReader:
     async def read_papers(self, papers, number_of_concurrent_tasks=10):
         tasks = [self.read_paper(paper) for paper in papers]
         total_papers = len(papers)
+        completed_tasks = 0
 
-        # Create a Streamlit progress bar
-        progress_bar = st.progress(0)
-        progress_text = st.empty()
+        # Initialize progress tracking elements in session state if they don't exist
+        if "progress_bar" not in st.session_state:
+            st.session_state.progress_bar = st.progress(0)
+        if "progress_text" not in st.session_state:
+            st.session_state.progress_text = st.empty()
 
         async def process_paper(task, index):
+            nonlocal completed_tasks
             result = await task
             # Update progress bar and text
-            progress = (index + 1) / total_papers
-            progress_bar.progress(progress)
-            progress_text.text(f"Processed {index + 1}/{total_papers} papers")
+            completed_tasks += 1
+            progress = completed_tasks / total_papers
+            st.session_state.progress_bar.progress(progress)
+            st.session_state.progress_text.text(
+                f"Processed {completed_tasks}/{total_papers} papers"
+            )
             return result
 
         limited_tasks = self._limit_concurrency(
@@ -91,7 +98,7 @@ class LLMPaperReader:
         responses = await asyncio.gather(*limited_tasks, return_exceptions=True)
 
         # Clear the progress text
-        progress_text.empty()
+        st.session_state.progress_text.empty()
 
         return responses
 
