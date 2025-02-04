@@ -65,7 +65,9 @@ def classify_papers(paper_list):
 
 
 def llm_read_papers(paper_list):
-    llm_reader = LLMPaperReader(config["openai_model"], config["topics"])
+    llm_reader = LLMPaperReader(
+        config["openai_model"], config["topics"], config["timeout_seconds"]
+    )
     papers_to_read = []
     for paper_id, paper in paper_list.items():
         if "judgement" not in paper:
@@ -79,7 +81,10 @@ def llm_read_papers(paper_list):
     )
     success_judgement_list = []
     for judgement in judgement_list:
-        if not isinstance(judgement, Exception):
+        if (
+            not isinstance(judgement, Exception)
+            and judgement.get("judgement") is not None
+        ):
             success_judgement_list.append(judgement)
     print(f"Read {len(success_judgement_list)} out of {len(judgement_list)} papers...")
 

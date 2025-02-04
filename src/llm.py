@@ -39,9 +39,10 @@ class LLMPaperReader:
          ```
     """
 
-    def __init__(self, model, topics):
+    def __init__(self, model, topics, timeout_seconds):
         self.model = model
         self.topics = topics
+        self.timeout_seconds = timeout_seconds
         self.client = AsyncOpenAI()
 
     # The code is borrowed from https://gist.github.com/benfasoli/650a57923ab1951e1cb6355f033cbc8b
@@ -60,12 +61,21 @@ class LLMPaperReader:
 
     async def read_paper(self, paper):
         print(f"Reading paper: [[{paper['title']}]]")
-        response = await self._call_api(paper)
-        response_content = response.choices[0].message.content
-        response_json = json.loads(response_content)
-        judgement = {"id": paper["id"], "judgement": response_json}
-        print(f"Done reading paper: [[{paper['title']}]]")
-        return judgement
+        try:
+            response = await asyncio.wait_for(
+                self._call_api(paper), timeout=self.timeout_seconds
+            )
+            response_content = response.choices[0].message.content
+            response_json = json.loads(response_content)
+            judgement = {"id": paper["id"], "judgement": response_json}
+            print(f"Done reading paper: [[{paper['title']}]]")
+            return judgement
+        except asyncio.TimeoutError:
+            print(f"Timeout reading paper: [[{paper['title']}]]")
+            return {"id": paper["id"], "judgement": None, "error": "timeout"}
+        except Exception as e:
+            print(f"Error reading paper: [[{paper['title']}]]: {str(e)}")
+            return {"id": paper["id"], "judgement": None, "error": str(e)}
 
     async def read_papers(self, papers, number_of_concurrent_tasks=10):
         tasks = [self.read_paper(paper) for paper in papers]
