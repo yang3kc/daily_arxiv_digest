@@ -18,11 +18,12 @@ export OPENAI_API_KEY=YOUR_OPENAI_KEY
 
 ## Dependency
 
-The tool was developed under Python 3.10.
+The tool was developed under Python 3.12.
+It uses [uv](https://docs.astral.sh/uv/) to manage the dependencies.
 You can install the dependencies with:
 
 ```sh
-pip install -r requirements.txt
+uv sync
 ```
 
 ## Usage
@@ -34,18 +35,11 @@ You can also change the OpenAI model, but make sure the model support JSON mode.
 You can run the tool by:
 
 ```sh
-python main.py
+uv run streamlit run arxiv_digest.py
 ```
 
-This would fetch the information about the newest arXiv papers through RSS feeds then use ChatGPT to evaluate the papers.
-
-Then you can run
-
-```sh
-streamlit run streamlit_app.py
-```
-
-To start a web interface to inspect the results.
+A web interface will be launched, where you can fetch the fresh papers and have ChatGPT evaluate them for you.
+You can then inspect the results in the web interface.
 
 # Disclaimer
 
