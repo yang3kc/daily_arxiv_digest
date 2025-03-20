@@ -9,4 +9,5 @@ dependencies = [
     "openai>=1.67.0",
     "pandas>=2.2.3",
     "streamlit>=1.43.2",
+    "watchdog>=6.0.0",
 ]
