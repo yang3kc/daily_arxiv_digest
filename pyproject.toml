@@ -1,0 +1,12 @@
+[project]
+name = "daily-arxiv-digest"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.12"
+dependencies = [
+    "beautifulsoup4>=4.13.3",
+    "feedparser>=6.0.11",
+    "openai>=1.67.0",
+    "pandas>=2.2.3",
+    "streamlit>=1.43.2",
+]
