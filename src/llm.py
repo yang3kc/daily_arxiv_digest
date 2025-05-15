@@ -3,8 +3,6 @@ from pydantic import BaseModel, Field
 from typing import List
 import os
 import pandas as pd
-from concurrent.futures import ThreadPoolExecutor, as_completed
-import streamlit as st
 
 
 class Judgement(BaseModel):
@@ -48,7 +46,7 @@ class LLMPaperReader:
         self.topics = topics
         self.timeout_seconds = timeout_seconds
 
-    def _read_paper(self, paper):
+    def read_paper(self, paper):
         response = self.client.responses.parse(
             model=self.model,
             temperature=0.0,
@@ -64,29 +62,3 @@ class LLMPaperReader:
         paper_judgement_df = pd.DataFrame(judgements)
         paper_judgement_df["id"] = paper["id"]
         return paper_judgement_df
-
-    def read_papers(self, papers, number_of_concurrent_tasks=10):
-        paper_judgements_list = []
-
-        if "progress_bar" not in st.session_state:
-            st.session_state.progress_bar = st.progress(0)
-        if "progress_text" not in st.session_state:
-            st.session_state.progress_text = st.empty()
-
-        with ThreadPoolExecutor(max_workers=number_of_concurrent_tasks) as executor:
-            futures = [executor.submit(self._read_paper, paper) for paper in papers]
-            finished_count = 0
-            for future in as_completed(futures):
-                finished_count += 1
-                progress = finished_count / len(papers)
-                st.session_state.progress_bar.progress(progress)
-                st.session_state.progress_text.text(
-                    f"Processed {finished_count}/{len(papers)} papers"
-                )
-                paper_judgements_list.append(future.result())
-        paper_judgements_df = pd.concat(paper_judgements_list)
-
-        # Clear the progress text
-        st.session_state.progress_text.empty()
-
-        return paper_judgements_df
