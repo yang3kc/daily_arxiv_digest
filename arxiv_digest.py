@@ -31,6 +31,7 @@ def fetch_arxiv_papers(config):
             status.update(label=info_text, state="running")
             paper_lists.append(paper_list)
         full_paper_list = pd.concat(paper_lists)
+        full_paper_list.drop_duplicates(subset=["id"], inplace=True)
         info_text = f"✅ Done obtaining {len(full_paper_list)} papers"
         st.write(info_text)
         status.update(label=info_text, state="complete", expanded=False)
@@ -67,6 +68,7 @@ def llm_read_papers():
                 f"Processed {len(paper_judgements_list)}/{len(paper_dict_list)} papers"
             )
     paper_judgements_df = pd.concat(paper_judgements_list)
+    paper_judgements_df.drop_duplicates()
 
     st.session_state.progress_text.empty()
 
