@@ -40,27 +40,36 @@ def fetch_arxiv_papers(config):
             st.write(info_text)
             status.update(label=info_text, state="running")
             paper_lists.append(paper_list)
-        merged_paper_list = pd.concat(paper_lists)
-        info_text = f"✅ Done obtaining {len(merged_paper_list)} papers"
+        full_paper_list = pd.concat(paper_lists)
+        info_text = f"✅ Done obtaining {len(full_paper_list)} papers"
         st.write(info_text)
         status.update(label=info_text, state="complete", expanded=False)
-    return merged_paper_list
+    st.session_state["arxiv_papers"] = full_paper_list
 
 
-def llm_read_papers(paper_list):
+def llm_read_papers():
+    paper_list = st.session_state["arxiv_papers"]
     llm_reader = LLMPaperReader(
         config["openai_model"], config["topics"], config["timeout_seconds"]
     )
 
     paper_dict_list = paper_list.to_dict(orient="records")
-    paper_judgements = llm_reader.read_papers(paper_dict_list)
+    paper_judgements = llm_reader.read_papers(
+        paper_dict_list, config["number_of_concurrent_tasks"]
+    )
+    st.session_state["paper_judgements"] = paper_judgements
+
+
+def merge_paper_list_with_paper_judgements():
+    paper_list = st.session_state["arxiv_papers"]
+    paper_judgements = st.session_state["paper_judgements"]
 
     paper_list_with_judgement = paper_list.merge(paper_judgements, on="id", how="left")
     paper_list_with_judgement["relevance"] = paper_list_with_judgement[
         "relevance"
     ].fillna(0)
     paper_list_with_judgement["reason"] = paper_list_with_judgement["reason"].fillna("")
-    print(paper_list_with_judgement.topic.value_counts())
+
     st.session_state["papers_with_judgement"] = paper_list_with_judgement
 
 
@@ -68,11 +77,12 @@ def llm_read_papers(paper_list):
 st.sidebar.title("arXiv digest")
 
 if st.sidebar.button("Fetch new papers"):
-    st.session_state["arxiv_papers"] = fetch_arxiv_papers(config)
+    fetch_arxiv_papers(config)
 
 
 if st.sidebar.button("Read papers"):
-    llm_read_papers(st.session_state["arxiv_papers"])
+    llm_read_papers()
+    merge_paper_list_with_paper_judgements()
 
 threshold = st.sidebar.slider(
     "Relevance threshold",
@@ -84,15 +94,13 @@ threshold = st.sidebar.slider(
 )
 st.session_state["threshold"] = threshold
 
-
 # Define selected_topic before using it
-selected_topic = st.sidebar.radio(
-    "Select Topic",
-    []
-    if "papers_with_judgement" not in st.session_state
-    else list(st.session_state["papers_with_judgement"].topic.unique()),
-    index=0,
-)
 
 if "papers_with_judgement" in st.session_state:
+    selected_topic = st.sidebar.radio(
+        "Select Topic",
+        list(st.session_state["papers_with_judgement"].topic.unique()),
+        index=0,
+    )
+
     display_papers(selected_topic)
