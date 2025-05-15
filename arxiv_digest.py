@@ -26,24 +26,6 @@ def display_papers(topic):
             st.markdown(f"{row['relevance']} || {row['reason']}")
 
 
-def display_papers_old(topic, paper_list):
-    st.markdown(f"## {topic} ({len(paper_list)} papers)")
-
-    for arxiv_paper in paper_list:
-        st.markdown(f"## [{arxiv_paper['title']}]({arxiv_paper['url']})")
-        st.markdown(f"{', '.join(arxiv_paper['authors'])}")
-        with st.expander("Abstract"):
-            st.markdown(arxiv_paper["abstract"])
-        if "judgement" in arxiv_paper:
-            with st.expander("Judgement"):
-                for topic, relevance in arxiv_paper["judgement"].items():
-                    if relevance["relevance"] > 0:
-                        st.markdown(
-                            f"{relevance['relevance']} || {topic} || {relevance['reason']}"
-                        )
-
-
-# @st.cache_data
 def fetch_arxiv_papers(config):
     paper_lists = []
     with st.status(
@@ -65,19 +47,6 @@ def fetch_arxiv_papers(config):
         st.write(info_text)
         status.update(label=info_text, state="complete", expanded=False)
     return merged_paper_list
-
-
-def classify_papers(paper_list):
-    papers_by_topics = {}
-    papers_by_topics["All"] = paper_list.values()
-    for paper_id, paper in paper_list.items():
-        for topic, relevance in paper["judgement"].items():
-            if relevance["relevance"] > 0.7:
-                if topic not in papers_by_topics:
-                    papers_by_topics[topic] = []
-                papers_by_topics[topic].append(paper)
-                # print(papers_by_topics[topic])
-    st.session_state["papers_by_topics"] = papers_by_topics
 
 
 def llm_read_papers_old(paper_list):
@@ -114,8 +83,6 @@ def llm_read_papers_old(paper_list):
             paper_judgement = judgement_results[paper_id]
             paper_with_judgement[paper_id] = paper_list[paper_id]
             paper_with_judgement[paper_id]["judgement"] = paper_judgement
-
-    classify_papers(paper_with_judgement)
 
 
 def llm_read_papers(paper_list):
