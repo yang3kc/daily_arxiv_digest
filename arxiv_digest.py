@@ -86,7 +86,13 @@ def llm_read_papers_old(paper_list):
 
 
 def llm_read_papers(paper_list):
-    paper_judgements = pd.read_csv("paper_judgements_df.csv")
+    llm_reader = LLMPaperReader(
+        config["openai_model"], config["topics"], config["timeout_seconds"]
+    )
+
+    paper_dict_list = paper_list.to_dict(orient="records")
+    paper_judgements = llm_reader.read_papers(paper_dict_list)
+
     paper_list_with_judgement = paper_list.merge(paper_judgements, on="id", how="left")
     paper_list_with_judgement["relevance"] = paper_list_with_judgement[
         "relevance"
