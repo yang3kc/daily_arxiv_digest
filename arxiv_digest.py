@@ -5,26 +5,15 @@ from src.llm import LLMPaperReader
 import pandas as pd
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
+########################################################
 # Load config
 with open("./config.json") as f:
     config = json.load(f)
 
 
-def display_papers(topic):
-    threshold = st.session_state["threshold"]
-    papers_to_show = st.session_state["papers_with_judgement"].query(
-        f"topic == '{topic}' and relevance >= {threshold}"
-    )
-    st.markdown(f"## {topic} ({len(papers_to_show)} papers)")
-    for _, row in papers_to_show.iterrows():
-        st.markdown(f"## [{row['title']}]({row['url']})")
-        st.markdown(f"{', '.join(row['authors'])}")
-        with st.expander("Abstract"):
-            st.markdown(row["abstract"])
-        with st.expander("Judgement"):
-            st.markdown(f"{row['relevance']} || {row['reason']}")
-
-
+########################################################
+# Data functions
+########################################################
 def fetch_arxiv_papers(config):
     paper_lists = []
     with st.status(
@@ -97,6 +86,24 @@ def merge_paper_list_with_paper_judgements():
     st.session_state["papers_with_judgement"] = paper_list_with_judgement
 
 
+########################################################
+# UI functions
+def display_papers(topic):
+    threshold = st.session_state["threshold"]
+    papers_to_show = st.session_state["papers_with_judgement"].query(
+        f"topic == '{topic}' and relevance >= {threshold}"
+    )
+    st.markdown(f"## {topic} ({len(papers_to_show)} papers)")
+    for _, row in papers_to_show.iterrows():
+        st.markdown(f"## [{row['title']}]({row['url']})")
+        st.markdown(f"{', '.join(row['authors'])}")
+        with st.expander("Abstract"):
+            st.markdown(row["abstract"])
+        with st.expander("Judgement"):
+            st.markdown(f"{row['relevance']} || {row['reason']}")
+
+
+########################################################
 # Sidebar
 st.sidebar.title("arXiv digest")
 
@@ -117,8 +124,6 @@ threshold = st.sidebar.slider(
     help="Papers with relevance scores above this threshold will be shown",
 )
 st.session_state["threshold"] = threshold
-
-# Define selected_topic before using it
 
 if "papers_with_judgement" in st.session_state:
     selected_topic = st.sidebar.radio(
