@@ -3,6 +3,7 @@ import json
 from src.rss import ArxivRSS
 from src.llm import LLMPaperReader
 import pandas as pd
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Load config
 with open("./config.json") as f:
@@ -48,16 +49,39 @@ def fetch_arxiv_papers(config):
 
 
 def llm_read_papers():
-    paper_list = st.session_state["arxiv_papers"]
     llm_reader = LLMPaperReader(
         config["openai_model"], config["topics"], config["timeout_seconds"]
     )
 
+    paper_list = st.session_state["arxiv_papers"]
     paper_dict_list = paper_list.to_dict(orient="records")
-    paper_judgements = llm_reader.read_papers(
-        paper_dict_list, config["number_of_concurrent_tasks"]
-    )
-    st.session_state["paper_judgements"] = paper_judgements
+
+    if "progress_bar" not in st.session_state:
+        st.session_state.progress_bar = st.progress(0)
+    if "progress_text" not in st.session_state:
+        st.session_state.progress_text = st.empty()
+
+    paper_judgements_list = []
+    with ThreadPoolExecutor(
+        max_workers=config["number_of_concurrent_tasks"]
+    ) as executor:
+        futures = [
+            executor.submit(llm_reader.read_paper, paper_dict)
+            for paper_dict in paper_dict_list
+        ]
+        for future in as_completed(futures):
+            paper_judgements_list.append(future.result())
+
+            progress = len(paper_judgements_list) / len(paper_dict_list)
+            st.session_state.progress_bar.progress(progress)
+            st.session_state.progress_text.text(
+                f"Processed {len(paper_judgements_list)}/{len(paper_dict_list)} papers"
+            )
+    paper_judgements_df = pd.concat(paper_judgements_list)
+
+    st.session_state.progress_text.empty()
+
+    st.session_state["paper_judgements"] = paper_judgements_df
 
 
 def merge_paper_list_with_paper_judgements():
