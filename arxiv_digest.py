@@ -49,42 +49,6 @@ def fetch_arxiv_papers(config):
     return merged_paper_list
 
 
-def llm_read_papers_old(paper_list):
-    llm_reader = LLMPaperReader(
-        config["openai_model"], config["topics"], config["timeout_seconds"]
-    )
-    papers_to_read = []
-    for paper_id, paper in paper_list.items():
-        if "judgement" not in paper:
-            papers_to_read.append(paper)
-
-    judgement_list = asyncio.run(
-        llm_reader.read_papers(
-            papers_to_read,
-            number_of_concurrent_tasks=config["number_of_concurrent_tasks"],
-        )
-    )
-    success_judgement_list = []
-    for judgement in judgement_list:
-        if (
-            not isinstance(judgement, Exception)
-            and judgement.get("judgement") is not None
-        ):
-            success_judgement_list.append(judgement)
-    print(f"Read {len(success_judgement_list)} out of {len(judgement_list)} papers...")
-
-    judgement_results = {}
-    for judgement in success_judgement_list:
-        judgement_results[judgement["id"]] = judgement["judgement"]
-
-    paper_with_judgement = {}
-    for paper_id in paper_list.keys():
-        if paper_id in judgement_results:
-            paper_judgement = judgement_results[paper_id]
-            paper_with_judgement[paper_id] = paper_list[paper_id]
-            paper_with_judgement[paper_id]["judgement"] = paper_judgement
-
-
 def llm_read_papers(paper_list):
     llm_reader = LLMPaperReader(
         config["openai_model"], config["topics"], config["timeout_seconds"]
@@ -116,7 +80,7 @@ threshold = st.sidebar.slider(
     "Relevance threshold",
     min_value=0.0,
     max_value=1.0,
-    value=0.3,
+    value=0.7,
     step=0.1,
     help="Papers with relevance scores above this threshold will be shown",
 )
