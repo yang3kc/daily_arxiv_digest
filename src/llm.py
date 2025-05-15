@@ -41,10 +41,11 @@ class LLMPaperReader:
     """
 
     def __init__(self, model, topics, timeout_seconds):
-        self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        self.client = OpenAI(
+            api_key=os.getenv("OPENAI_API_KEY"), timeout=timeout_seconds
+        )
         self.model = model
         self.topics = topics
-        self.timeout_seconds = timeout_seconds
 
     def read_paper(self, paper):
         response = self.client.responses.parse(
