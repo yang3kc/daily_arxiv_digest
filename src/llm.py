@@ -1,7 +1,23 @@
-from openai import AsyncOpenAI
-import asyncio
-import json
-import streamlit as st
+from openai import OpenAI
+from pydantic import BaseModel, Field
+from typing import List
+import os
+import pandas as pd
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+
+class Judgement(BaseModel):
+    topic: str = Field(description="The topic of the paper")
+    relevance: float = Field(
+        description="The relevance of the paper to the topic, a number between 0 and 1"
+    )
+    reason: str = Field(description="The reason for the relevance")
+
+
+class Judgements(BaseModel):
+    judgements: List[Judgement] = Field(
+        description="A list of topics with relevance and reasoning"
+    )
 
 
 class LLMPaperReader:
@@ -23,109 +39,39 @@ class LLMPaperReader:
         The paper MUST directly mention the topics to be relevant; papers with indirect relations and potential implications should have scores close to 0.
         If the paper is relevant to the topic, provide a short explanation; otherwise, leave the explanation empty.
         Use your best guess when you are not sure.
-        The output should be in JSON format and follow the following schema:
-        --------------
-        ```json
-        {{
-            'topic 1': {{
-                'relevance': 0,
-                'reason': ''
-            }},
-            'topic 2': {{
-                'relevance': 0.9,
-                'reason': 'The paper ....'
-            }}
-        }}
-         ```
     """
 
     def __init__(self, model, topics, timeout_seconds):
+        self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
         self.model = model
         self.topics = topics
         self.timeout_seconds = timeout_seconds
-        self.client = AsyncOpenAI()
 
-    # The code is borrowed from https://gist.github.com/benfasoli/650a57923ab1951e1cb6355f033cbc8b
-    def _limit_concurrency(self, tasks, number_of_concurrent_tasks):
-        """
-        Decorate coroutines to limit concurrency.
-        Enforces a limit on the number of coroutines that can run concurrently in higher level asyncio-compatible concurrency managers like asyncio.gather(coroutines)
-        """
-        semaphore = asyncio.Semaphore(number_of_concurrent_tasks)
-
-        async def with_concurrency_limit(task):
-            async with semaphore:
-                return await task
-
-        return [with_concurrency_limit(task) for task in tasks]
-
-    async def read_paper(self, paper):
-        print(f"Reading paper: [[{paper['title']}]]")
-        try:
-            response = await asyncio.wait_for(
-                self._call_api(paper), timeout=self.timeout_seconds
-            )
-            response_content = response.choices[0].message.content
-            response_json = json.loads(response_content)
-            judgement = {"id": paper["id"], "judgement": response_json}
-            print(f"Done reading paper: [[{paper['title']}]]")
-            return judgement
-        except asyncio.TimeoutError:
-            print(f"Timeout reading paper: [[{paper['title']}]]")
-            return {"id": paper["id"], "judgement": None, "error": "timeout"}
-        except Exception as e:
-            print(f"Error reading paper: [[{paper['title']}]]: {str(e)}")
-            return {"id": paper["id"], "judgement": None, "error": str(e)}
-
-    async def read_papers(self, papers, number_of_concurrent_tasks=10):
-        tasks = [self.read_paper(paper) for paper in papers]
-        total_papers = len(papers)
-        completed_tasks = 0
-
-        # Initialize progress tracking elements in session state if they don't exist
-        if "progress_bar" not in st.session_state:
-            st.session_state.progress_bar = st.progress(0)
-        if "progress_text" not in st.session_state:
-            st.session_state.progress_text = st.empty()
-
-        async def process_paper(task, index):
-            nonlocal completed_tasks
-            result = await task
-            # Update progress bar and text
-            completed_tasks += 1
-            progress = completed_tasks / total_papers
-            st.session_state.progress_bar.progress(progress)
-            st.session_state.progress_text.text(
-                f"Processed {completed_tasks}/{total_papers} papers"
-            )
-            return result
-
-        limited_tasks = self._limit_concurrency(
-            [process_paper(task, i) for i, task in enumerate(tasks)],
-            number_of_concurrent_tasks,
-        )
-
-        responses = await asyncio.gather(*limited_tasks, return_exceptions=True)
-
-        # Clear the progress text
-        st.session_state.progress_text.empty()
-
-        return responses
-
-    async def _call_api(self, paper):
-        response = await self.client.chat.completions.create(
+    def _read_paper(self, paper):
+        response = self.client.responses.parse(
             model=self.model,
-            response_format={"type": "json_object"},
-            messages=[
-                {"role": "system", "content": self.system_message},
-                {
-                    "role": "user",
-                    "content": self.user_message.format(
-                        title=paper["title"],
-                        abstract=paper["abstract"],
-                        topics=self.topics,
-                    ),
-                },
-            ],
+            temperature=0.0,
+            instructions=self.system_message,
+            input=self.user_message.format(
+                title=paper["title"],
+                abstract=paper["abstract"],
+                topics=self.topics,
+            ),
+            text_format=Judgements,
         )
-        return response
+        judgements = response.output_parsed.model_dump()["judgements"]
+        paper_judgement_df = pd.DataFrame(judgements)
+        paper_judgement_df["id"] = paper["id"]
+        return paper_judgement_df
+
+    def read_papers(self, papers, number_of_concurrent_tasks=10):
+        paper_judgements_list = []
+        with ThreadPoolExecutor(max_workers=number_of_concurrent_tasks) as executor:
+            futures = [executor.submit(self._read_paper, paper) for paper in papers]
+            finished_count = 0
+            for future in as_completed(futures):
+                finished_count += 1
+                print(f"Finished {finished_count} of {len(papers)} papers")
+                paper_judgements_list.append(future.result())
+        paper_judgements_df = pd.concat(paper_judgements_list)
+        return paper_judgements_df
