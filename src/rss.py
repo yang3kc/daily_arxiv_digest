@@ -1,19 +1,22 @@
 from bs4 import BeautifulSoup
 import feedparser
+import pandas as pd
 
 
 class ArxivRSS:
     def __init__(self, url):
         self.url = url
-        self.papers = dict()
+        self.paper_df = None
 
     def fetch_paper_list(self):
         feed = self._fetch_n_parse_rss()
 
+        paper_list = []
         for rss_entry in feed["entries"]:
             paper_information = self._extract_paper_information(rss_entry)
-            self.papers[paper_information["id"]] = paper_information
-        return self.papers
+            paper_list.append(paper_information)
+        self.paper_df = pd.DataFrame(paper_list)
+        return self.paper_df
 
     def _fetch_n_parse_rss(self):
         feed = feedparser.parse(self.url)
