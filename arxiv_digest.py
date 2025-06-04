@@ -60,8 +60,10 @@ def llm_read_papers():
             for paper_dict in paper_dict_list
         ]
         for future in as_completed(futures):
-            paper_judgements_list.append(future.result())
-
+            try:
+                paper_judgements_list.append(future.result())
+            except Exception as e:
+                st.warning(f"Worker failed: {e}")
             progress = len(paper_judgements_list) / len(paper_dict_list)
             st.session_state.progress_bar.progress(progress)
             st.session_state.progress_text.text(
