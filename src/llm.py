@@ -1,4 +1,4 @@
-from openai import OpenAI
+from openai import OpenAI, OpenAIError
 from pydantic import BaseModel, Field
 from typing import List
 import os
@@ -47,19 +47,42 @@ class LLMPaperReader:
         self.model = model
         self.topics = topics
 
-    def read_paper(self, paper):
-        response = self.client.responses.parse(
-            model=self.model,
-            temperature=0.0,
-            instructions=self.system_message,
-            input=self.user_message.format(
-                title=paper["title"],
-                abstract=paper["abstract"],
-                topics=self.topics,
-            ),
-            text_format=Judgements,
-        )
-        judgements = response.output_parsed.model_dump()["judgements"]
-        paper_judgement_df = pd.DataFrame(judgements)
-        paper_judgement_df["id"] = paper["id"]
-        return paper_judgement_df
+    def read_paper(self, paper, max_retries: int = 3):
+        """Read a single paper and return a judgement dataframe.
+
+        A few requests to the OpenAI API may fail temporarily (e.g. returning a
+        404 status).  To prevent a single failure from aborting the whole batch
+        run, this method retries the request a few times and falls back to a
+        neutral judgement when all retries fail.
+        """
+
+        attempt = 0
+        while attempt < max_retries:
+            try:
+                response = self.client.responses.parse(
+                    model=self.model,
+                    temperature=0.0,
+                    instructions=self.system_message,
+                    input=self.user_message.format(
+                        title=paper["title"],
+                        abstract=paper["abstract"],
+                        topics=self.topics,
+                    ),
+                    text_format=Judgements,
+                )
+                judgements = response.output_parsed.model_dump()["judgements"]
+                paper_judgement_df = pd.DataFrame(judgements)
+                paper_judgement_df["id"] = paper["id"]
+                return paper_judgement_df
+            except OpenAIError as e:
+                attempt += 1
+                if attempt >= max_retries:
+                    # Construct a neutral judgement so downstream code keeps running
+                    topics = self.topics
+                    if not isinstance(topics, list):
+                        topics = [topics]
+                    paper_judgement_df = pd.DataFrame(
+                        [{"topic": t, "relevance": 0.0, "reason": str(e)} for t in topics]
+                    )
+                    paper_judgement_df["id"] = paper["id"]
+                    return paper_judgement_df
