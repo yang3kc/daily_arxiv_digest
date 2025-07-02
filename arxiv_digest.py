@@ -123,7 +123,7 @@ threshold = st.sidebar.slider(
     "Relevance threshold",
     min_value=0.0,
     max_value=1.0,
-    value=0.7,
+    value=config["default_relevance_threshold"],
     step=0.1,
     help="Papers with relevance scores above this threshold will be shown",
 )
