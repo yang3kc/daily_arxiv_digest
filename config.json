@@ -15,5 +15,6 @@
     ],
     "openai_model": "gpt-4.1-mini",
     "number_of_concurrent_tasks": 50,
-    "timeout_seconds": 40
+    "timeout_seconds": 40,
+    "default_relevance_threshold": 0.8
 }
