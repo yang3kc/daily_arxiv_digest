@@ -1,6 +1,6 @@
-from bs4 import BeautifulSoup
 import feedparser
 import pandas as pd
+from bs4 import BeautifulSoup
 
 
 class ArxivRSS:
@@ -31,10 +31,17 @@ class ArxivRSS:
         paper_title = rss_entry["title"]
         paper_abstract = self._parse_html_element(rss_entry["summary"])
         paper_url = rss_entry["link"]
+
+        # Parse authors
         paper_authors = []
-        for author_info in rss_entry["authors"]:
-            author_name = self._parse_html_element(author_info["name"])
-            paper_authors.append(author_name)
+        author_name_string = rss_entry["author"]
+        for item in author_name_string.split(","):
+            paper_authors.append(item.strip())
+
+        # Truncate authors if too many
+        if len(paper_authors) > 10:
+            paper_authors = paper_authors[:10] + ["..."]
+
         return {
             "id": paper_id,
             "title": paper_title,
