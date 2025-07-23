@@ -41,6 +41,17 @@ uv run streamlit run arxiv_digest.py
 A web interface will be launched, where you can fetch the fresh papers and have ChatGPT evaluate them for you.
 You can then inspect the results in the web interface.
 
+## Dev
+
+To run the notebooks, you can use:
+
+```sh
+uv run --with notebook jupyter notebook
+```
+
+to leverage the local virtual environment.
+
+
 # Disclaimer
 
 This tool is mainly built for my personal use.
