@@ -5,6 +5,7 @@ import pandas as pd
 import streamlit as st
 
 from src.llm import LLMPaperReader
+from src.logger import logger
 from src.rss import ArxivRSS
 
 ########################################################
@@ -17,6 +18,7 @@ with open("./config.json") as f:
 # Data functions
 ########################################################
 def fetch_arxiv_papers(config):
+    logger.log_activity("fetch_papers", "started")
     paper_lists = []
     with st.status(
         "Fetching data from arxiv", expanded=False
@@ -38,9 +40,15 @@ def fetch_arxiv_papers(config):
         st.write(info_text)
         status.update(label=info_text, state="complete", expanded=False)
     st.session_state["arxiv_papers"] = full_paper_list
+    logger.log_activity(
+        "fetch_papers",
+        "completed",
+        {"papers_count": len(full_paper_list)},
+    )
 
 
 def llm_read_papers():
+    logger.log_activity("llm_processing", "started")
     llm_reader = LLMPaperReader(
         config["openai_model"], config["topics"], config["timeout_seconds"]
     )
@@ -77,6 +85,14 @@ def llm_read_papers():
     st.session_state.progress_text.empty()
 
     st.session_state["paper_judgements"] = paper_judgements_df
+    logger.log_activity(
+        "llm_processing",
+        "completed",
+        {
+            "judgements_count": len(paper_judgements_df),
+            "papers_count": len(paper_dict_list),
+        },
+    )
 
 
 def merge_paper_list_with_paper_judgements():
@@ -120,6 +136,7 @@ if st.sidebar.button("Fetch new papers"):
 if st.sidebar.button("Read papers"):
     llm_read_papers()
     merge_paper_list_with_paper_judgements()
+    logger.log_activity("complete_run", "completed")
 
 threshold = st.sidebar.slider(
     "Relevance threshold",
