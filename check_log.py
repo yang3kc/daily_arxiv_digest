@@ -57,12 +57,12 @@ def show_today_status():
         print(f"{format_status(status)} {format_action(action)}")
 
         # Show relevant metadata
-        if action == "fetch_papers" and "paper_count" in metadata:
-            print(f"   📄 Papers fetched: {metadata['paper_count']}")
-        elif action == "llm_processing" and "papers_processed" in metadata:
-            processed = metadata.get("papers_processed", 0)
-            total = metadata.get("papers_total", 0)
-            print(f"   🤖 Papers processed: {processed}/{total}")
+        if action == "fetch_papers" and "papers_count" in metadata:
+            print(f"   📄 Papers fetched: {metadata['papers_count']}")
+        elif action == "llm_processing" and "judgements_count" in metadata:
+            judgements = metadata.get("judgements_count", 0)
+            total = metadata.get("papers_count", 0)
+            print(f"   🤖 Papers processed: {total} papers, {judgements} judgements")
 
     # Overall status
     has_completed_run = logger.has_run_today()
@@ -117,10 +117,10 @@ def show_recent_activity():
             processed_count = 0
 
             if fetch_logs:
-                paper_count = fetch_logs[-1].get("metadata", {}).get("paper_count", 0)
+                paper_count = fetch_logs[-1].get("metadata", {}).get("papers_count", 0)
             if llm_logs:
                 processed_count = (
-                    llm_logs[-1].get("metadata", {}).get("papers_processed", 0)
+                    llm_logs[-1].get("metadata", {}).get("papers_count", 0)
                 )
 
             print(
@@ -164,10 +164,15 @@ def show_statistics():
     ]
     if llm_logs:
         paper_counts = [
-            l.get("metadata", {}).get("papers_processed", 0) for l in llm_logs
+            l.get("metadata", {}).get("papers_count", 0) for l in llm_logs
+        ]
+        judgement_counts = [
+            l.get("metadata", {}).get("judgements_count", 0) for l in llm_logs
         ]
         avg_papers = sum(paper_counts) / len(paper_counts) if paper_counts else 0
+        avg_judgements = sum(judgement_counts) / len(judgement_counts) if judgement_counts else 0
         print(f"📄 Average papers processed per run: {avg_papers:.1f}")
+        print(f"🤖 Average judgements generated per run: {avg_judgements:.1f}")
 
 
 def main():
