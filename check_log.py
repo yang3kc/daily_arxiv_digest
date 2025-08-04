@@ -11,6 +11,15 @@ from datetime import datetime
 from src.logger import logger
 
 
+def format_date_with_weekday(date_str: str) -> str:
+    """Format date string to include weekday."""
+    try:
+        date_obj = datetime.strptime(date_str, "%Y-%m-%d")
+        return f"{date_obj.strftime('%A')}, {date_str}"
+    except ValueError:
+        return date_str
+
+
 def format_status(status: str) -> str:
     """Format status with color codes."""
     colors = {
@@ -36,7 +45,8 @@ def show_today_status():
     today = datetime.now().strftime("%Y-%m-%d")
     today_logs = logger.get_logs_by_date(today)
 
-    print(f"\n📅 Today's Status ({today})")
+    today_with_weekday = format_date_with_weekday(today)
+    print(f"\n📅 Today's Status ({today_with_weekday})")
     print("=" * 40)
 
     if not today_logs:
@@ -123,13 +133,15 @@ def show_recent_activity():
                     llm_logs[-1].get("metadata", {}).get("papers_count", 0)
                 )
 
+            date_with_weekday = format_date_with_weekday(date)
             print(
-                f"✅ {date}: Complete run ({paper_count} papers, {processed_count} processed)"
+                f"✅ {date_with_weekday}: Complete run ({paper_count} papers, {processed_count} processed)"
             )
         else:
             # Show partial activity
             activity_types = set(log.get("action") for log in logs)
-            print(f"⚠️  {date}: Partial activity ({', '.join(activity_types)})")
+            date_with_weekday = format_date_with_weekday(date)
+            print(f"⚠️  {date_with_weekday}: Partial activity ({', '.join(activity_types)})")
 
 
 def show_statistics():
