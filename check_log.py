@@ -15,7 +15,7 @@ def format_date_with_weekday(date_str: str) -> str:
     """Format date string to include weekday."""
     try:
         date_obj = datetime.strptime(date_str, "%Y-%m-%d")
-        return f"{date_obj.strftime('%A')}, {date_str}"
+        return f"{date_obj.strftime('%a')}, {date_str}"
     except ValueError:
         return date_str
 
@@ -141,7 +141,9 @@ def show_recent_activity():
             # Show partial activity
             activity_types = set(log.get("action") for log in logs)
             date_with_weekday = format_date_with_weekday(date)
-            print(f"⚠️  {date_with_weekday}: Partial activity ({', '.join(activity_types)})")
+            print(
+                f"⚠️  {date_with_weekday}: Partial activity ({', '.join(activity_types)})"
+            )
 
 
 def show_statistics():
@@ -175,14 +177,14 @@ def show_statistics():
         if l.get("action") == "llm_processing" and l.get("status") == "completed"
     ]
     if llm_logs:
-        paper_counts = [
-            l.get("metadata", {}).get("papers_count", 0) for l in llm_logs
-        ]
+        paper_counts = [l.get("metadata", {}).get("papers_count", 0) for l in llm_logs]
         judgement_counts = [
             l.get("metadata", {}).get("judgements_count", 0) for l in llm_logs
         ]
         avg_papers = sum(paper_counts) / len(paper_counts) if paper_counts else 0
-        avg_judgements = sum(judgement_counts) / len(judgement_counts) if judgement_counts else 0
+        avg_judgements = (
+            sum(judgement_counts) / len(judgement_counts) if judgement_counts else 0
+        )
         print(f"📄 Average papers processed per run: {avg_papers:.1f}")
         print(f"🤖 Average judgements generated per run: {avg_judgements:.1f}")
 
