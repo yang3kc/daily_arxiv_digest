@@ -1,0 +1,737 @@
+{
+  "date": "2026-07-15",
+  "generated_at": "2026-07-16T03:35:42.085538+00:00",
+  "provider": "openai",
+  "model": "gpt-4.1-mini",
+  "relevance_threshold": 0.8,
+  "arxiv_subjects": [
+    "cs.CY",
+    "cs.CL"
+  ],
+  "topics": [
+    "Security of AI and language models",
+    "Applications of AI and language models in social science research",
+    "Using AI to simulate humans in various contexts",
+    "Methods to increase the factuality of language model response",
+    "AI and language models for generating misinformation or fact-checking",
+    "Methods and applications of using AI for image and video analysis",
+    "AI as information curation tools such as search engines, news aggregators, etc."
+  ],
+  "stats": {
+    "papers_fetched": 119,
+    "papers_selected": 33
+  },
+  "papers": [
+    {
+      "id": "oai:arXiv.org:2607.11890v1",
+      "title": "So Many Opinions, So Many LLMs: Comparing Large Language Models to Traditional Machine Learning for Open- Ended Survey Analysis",
+      "authors": [
+        "Abdullah Akinde",
+        "Mariam Akinde",
+        "Rasheedat Emiola",
+        "Ahmed Akinsola"
+      ],
+      "url": "https://arxiv.org/abs/2607.11890",
+      "abstract": "arXiv:2607.11890v1 Announce Type: new \nAbstract: Open-ended surveys offer valuable insights, but they are notoriously difficult to analyze at scale. Building on previous work that employed traditional machine learning to classify text (\"So Many Responses, So Little Time: A Machine-Learning Approach to Analyzing Open-Ended Survey Data\") [1], this study investigates how different large language models (LLMs) understand and analyze NSSE open-ended survey responses. We focus on several cutting-edge LLMSs-OpenAI's GPT series, Twitter-roBERTa-base model, and Meta's LLaMA-and compare their performance to the previous machine learning models in tasks like sentiment analysis and thematic classification. Our research analysis assesses model agreement, classification accuracy, and interpretability of reasoning. The findings reveal that current LLMs routinely beat classic machine learning models in classification accuracy, particularly in understanding complex mood and theme patterns in student replies. While LLMs have superior accuracy, they differ greatly in how explicitly and consistently they justify their predictions and apply category boundaries. These distinctions highlight crucial trade-offs when using LLMs for qualitative analysis: increased predictive strength comes with issues in consistency and explainability. Our findings illustrate the benefits and drawbacks of utilizing various LLMs for large-scale qualitative research, and we provide practical advice for researchers looking to balance automation and interpretive rigor.",
+      "tldr": "This study compares advanced large language models (LLMs) like GPT and LLaMA to traditional machine learning methods for analyzing open-ended survey responses. It finds that LLMs generally provide more accurate classification of sentiments and themes but vary in how clearly they explain their decisions. The research highlights a trade-off between improved accuracy and challenges in consistency and interpretability when using LLMs for qualitative survey analysis.",
+      "matched_topics": [
+        {
+          "topic": "Applications of AI and language models in social science research",
+          "relevance": 1.0,
+          "reason": "The paper directly discusses using large language models to analyze open-ended survey data, which is a social science research application."
+        }
+      ]
+    },
+    {
+      "id": "oai:arXiv.org:2607.11895v1",
+      "title": "AgentSociety 2: An Integrated Research Environment for Executable Social Science",
+      "authors": [
+        "Jinghua Piao",
+        "Jun Zhang",
+        "Haoyu Huang",
+        "Keming Zhang",
+        "Jing Yi Wang",
+        "Songwei Li",
+        "Boyuan Sun",
+        "Jiayi Chang",
+        "Fengli Xu",
+        "Chunyan Wang",
+        "..."
+      ],
+      "url": "https://arxiv.org/abs/2607.11895",
+      "abstract": "arXiv:2607.11895v1 Announce Type: new \nAbstract: AI scientist systems are beginning to automate parts of scientific research, but social science poses a distinct challenge: its objects of inquiry are not merely datasets or laboratory protocols, but integrated social processes involving situated participants, interaction contexts, interventions, and outcomes. Yet a critical link is missing: existing systems either assist isolated research tasks or simulate agents as experimental subjects, leaving the research workflow and simulated society decoupled. Here we introduce AgentSociety 2, an Integrated Research Environment for executable social science. It couples two roles of LLM agents in the same runtime: AI social scientists that coordinate literature grounding, hypothesis generation, experiment design, simulation execution, result interpretation, and manuscript drafting; and silicon participants that generate behavioral responses within configurable social environments. This dual-role design turns hypotheses into auditable agent behaviors, environment rules, interventions, and measurements, thereby supporting an end-to-end workflow. Across seven illustrative studies spanning micro-level social-science laboratory experiments, meso-level dynamics in social media, and macro-level urban scenarios, we demonstrate its capacity to support diverse disciplinary questions, reproduce major qualitative patterns from prior studies, identify informative deviations, and enable large-scale simulations through optimized agent-environment interactions. By preserving human researchers' high-level agency while delegating procedural orchestration to agentic systems, it provides a human-in-the-loop and controllable infrastructure for next-generation computational social science, with broader applications in scalable computational social experimentation and AI-enabled social governance platforms.",
+      "tldr": "This paper presents AgentSociety 2, a system that integrates AI agents to both conduct social science research and simulate participant behaviors within social environments. By combining hypothesis generation, experiment design, and simulation in one platform, it enables comprehensive and auditable social science workflows. The system successfully replicates known social patterns and supports large-scale simulations, offering a powerful tool for advancing computational social science with human oversight.",
+      "matched_topics": [
+        {
+          "topic": "Applications of AI and language models in social science research",
+          "relevance": 1.0,
+          "reason": "The paper presents AgentSociety 2, an integrated research environment that uses AI and language models specifically for executable social science research, including hypothesis generation, experiment design, and simulation execution."
+        },
+        {
+          "topic": "Using AI to simulate humans in various contexts",
+          "relevance": 1.0,
+          "reason": "The paper describes silicon participants that generate behavioral responses within configurable social environments, effectively simulating human behavior in social science experiments."
+        }
+      ]
+    },
+    {
+      "id": "oai:arXiv.org:2607.12086v1",
+      "title": "CityBehavEx: A Scalable and Empirically Validated LLM-Assisted Urban Simulation Platform",
+      "authors": [
+        "Gustavo H. Santos",
+        "Aline Viana",
+        "Thiago H Silva"
+      ],
+      "url": "https://arxiv.org/abs/2607.12086",
+      "abstract": "arXiv:2607.12086v1 Announce Type: cross \nAbstract: Recent LLM-based multi-agent urban simulators can generate semantically rich city routines, but they remain costly to scale and are often weakly validated against empirical mobility patterns. We present CityBehavEx, an interactive LLM-assisted urban simulation platform that scales to city-size populations, exposes agent behavior for inspection, supports empirical validation, and generates mobility patterns that better match real-world spatial, temporal, and semantic distributions. Instead of invoking large language models for every agent action, CityBehavEx combines established human mobility models with fine-tuned cross-encoders that estimate semantic alignment between agent profiles, schedules, and activity transitions. This design enables large-scale simulations, as demonstrated in a case study of 100,000 agents over 75 days in under one hour on a single consumer GPU. The platform allows users to define simulation regions, launch experiments, inspect trajectories and activity traces, debug unrealistic behaviors, and validate generated routines against real-world mobility, time-use, and semantic metrics.",
+      "tldr": "This paper introduces CityBehavEx, a new urban simulation platform that uses a combination of human mobility models and fine-tuned language models to efficiently simulate realistic city-scale human behaviors. The platform can simulate large populations quickly while allowing users to inspect and validate agent behaviors against real-world data. Their approach produces mobility patterns that closely match actual spatial, temporal, and activity distributions, demonstrating improved scalability and accuracy over previous methods.",
+      "matched_topics": [
+        {
+          "topic": "Using AI to simulate humans in various contexts",
+          "relevance": 1.0,
+          "reason": "The paper presents a platform that uses LLMs and mobility models to simulate city-scale human behavior and routines, directly involving AI-based human simulation."
+        }
+      ]
+    },
+    {
+      "id": "oai:arXiv.org:2607.12336v1",
+      "title": "Evaluating Health Misinformation in Low-Resource Languages: Integrating Small Language Models with a Culturally-Sensitive Responsible NLP Framework (Bangla as a Case Study)",
+      "authors": [
+        "Farnaz Farid",
+        "Raihan Alam",
+        "Al Al-Areqi",
+        "Farhad Ahamed",
+        "Muhammad Hassan Khan",
+        "Sadia Hossain",
+        "Irena Veljanova",
+        "Anika Tabassum Binte Hossain"
+      ],
+      "url": "https://arxiv.org/abs/2607.12336",
+      "abstract": "arXiv:2607.12336v1 Announce Type: cross \nAbstract: Artificial Intelligence (AI) technologies, while serving as a foundational enabler for modern social media and digital health services, exert a bivalent effect by simultaneously acting as a combatant against and a spread vector for misinformation. A prevalent challenge in mitigating this issue arises in non-English contexts and low socioeconomic classes, where limited data hinders the training of AI models for effective detection. Consequently, culturally and linguistically diverse (CALD) communities struggle to access trustworthy health information through AI-driven tools. Current AI tools underperform due to a lack of training data and are largely unable to consider language nuances and traditions in non-English contexts. This research addresses these gaps by proposing a CALD-friendly AI-based health misinformation detector and providing a dashboard for medical professionals to analyse this misinformation, a critical step toward mitigating a growing concern among CALD populations. To this end, we conduct a series of experiments using a Bangla-translated health misinformation dataset to evaluate the performance of various Small Language Models (SLMs). SLMs are particularly relevant in this context given the frequent underperformance of Large Language Models (LLMs), which often stems from insufficient domain-specific knowledge and the prohibitive costs of resource-intensive fine-tuning. The results demonstrate that Phi-4 is the superior model, achieving an ideal balance between precision and recall in claim extraction. Then, to mitigate the limitations of SLMs, we design and test a novel health misinformation detection framework grounded in Responsible Natural Language Processing (NLP), which incorporates cultural sensitivity, potential for harm, and communication quality, thereby providing a holistic lens for evaluating misinformation in low-resource languages.",
+      "tldr": "This paper tackles the challenge of detecting health misinformation in low-resource languages like Bangla by using small language models (SLMs) instead of large, costly models. The authors found that the Phi-4 model performed best in identifying false claims and developed a culturally sensitive framework to better evaluate misinformation's impact. Their approach helps improve trustworthy health information access for diverse communities with limited data resources.",
+      "matched_topics": [
+        {
+          "topic": "AI and language models for generating misinformation or fact-checking",
+          "relevance": 1.0,
+          "reason": "The paper directly addresses health misinformation detection using AI and language models, including fact-checking aspects."
+        }
+      ]
+    },
+    {
+      "id": "oai:arXiv.org:2607.12650v1",
+      "title": "Evidence-Grounded Verified Agentic Reasoning: A Path Toward Eliminating LLM Hallucination in Empirical Inference via Tool-Attested Kernel Proofs",
+      "authors": [
+        "Junyu Ren"
+      ],
+      "url": "https://arxiv.org/abs/2607.12650",
+      "abstract": "arXiv:2607.12650v1 Announce Type: cross \nAbstract: Tool access alone does not make LLM empirical reasoning governable: accepted outputs need not descend from attested evidence, and accepted deductions need not hold up under formal scrutiny. We present EG-VAR (Evidence-Grounded Verified Agentic Reasoning), a Lean 4-based tool-calling architecture in which the Lean kernel is the sole minter of Verified claims via tool-attestation axioms and declared source lifts. Every verified output structurally descends from an attested tool call (Thm. 3.1) and a kernel-checked chain of valid inference (Thm. 3.2); residual outputs are honest Abstain with a replayable audit trail. On a subcollection of TableBench numerical reasoning (n=120), EG-VAR attains 120/120 versus a 95% same-tool baseline; on counterfactual stress tests (5 domains x 2 models), EG-VAR stays 100% source-faithful while same-tool drops to 80-90% (no-tool 50-80%). With the LLM as deployment-time formalizer, residual semantic-formalization error is 3.3% on Sonnet and 1.7% on Opus. We position EG-VAR as a technical-governance interface for high-stakes empirical claims: a formal sidecar makes the target proposition, source scope, evidence boundary, proof obligation, and abstention condition auditable, eliminating unsupported Verified outputs today while turning formalization errors, lift and source-authority disputes, ambiguities, and abstentions into explicit audit targets. Over time, typed sidecars in datasets, APIs, public records, and AI-generated documents can amortize this formalization burden into reusable infrastructure.",
+      "tldr": "This paper introduces EG-VAR, a system that ensures large language model (LLM) outputs are backed by verified evidence and formal reasoning, reducing hallucinations in empirical inference. By integrating a formal proof kernel with tool calls, EG-VAR guarantees that every verified claim is traceable and logically sound, achieving perfect accuracy on tested numerical reasoning tasks and maintaining source fidelity under stress tests. The approach also provides transparent audit trails and explicit handling of uncertainties, paving the way for trustworthy AI in high-stakes decision-making.",
+      "matched_topics": [
+        {
+          "topic": "Methods to increase the factuality of language model response",
+          "relevance": 1.0,
+          "reason": "The paper focuses on eliminating hallucination in LLMs and ensuring verified, evidence-grounded reasoning, directly addressing factuality."
+        },
+        {
+          "topic": "AI and language models for generating misinformation or fact-checking",
+          "relevance": 0.8,
+          "reason": "The paper aims to eliminate unsupported outputs and improve source-faithfulness, which relates to fact-checking and reducing misinformation."
+        }
+      ]
+    },
+    {
+      "id": "oai:arXiv.org:2510.18939v2",
+      "title": "Lost in the Maze: Overcoming Context Limitations in Long-Horizon Agentic Search",
+      "authors": [
+        "Howard Yen",
+        "Yoonsang Lee",
+        "Ashwin Paranjape",
+        "Mengzhou Xia",
+        "Thejas Venkatesh",
+        "Jack Hessel",
+        "Danqi Chen",
+        "Yuhao Zhang"
+      ],
+      "url": "https://arxiv.org/abs/2510.18939",
+      "abstract": "arXiv:2510.18939v2 Announce Type: replace \nAbstract: Long-horizon agentic search requires iteratively exploring the web over long trajectories and synthesizing information across many sources, enabling powerful applications like deep research systems. In this work, we show that popular agentic search frameworks struggle to scale to long trajectories primarily due to context limitations--they accumulate long, noisy content, hit context window and tool budgets, or stop early. We therefore introduce SLIM (Simple Lightweight Information Management), a simple framework that separates retrieval into distinct search and browse tools, and periodically summarizes the trajectory, keeping context concise while enabling longer, more focused searches. Across a wide range of long-horizon tasks, SLIM achieves comparable performance at substantially lower cost and far fewer tool calls than strong open-source frameworks with both proprietary and open-weight models, including RL-trained models for deep research. Specifically, with o3 as the base model, SLIM achieves 56% on BrowseComp and 33% on HLE, outperforming all open-source frameworks by 8 and 6 absolute points, respectively, while incurring 4-6x fewer tool calls. With GLM-4.7 Flash, SLIM achieves 10 points improvement over the next best open-source framework, Search-o1, on BrowseComp using a third of the cost. To systematically understand failure modes in long-horizon agentic search, we develop an automated fine-grained trajectory analysis pipeline and error taxonomy, and find that SLIM exhibits significantly fewer hallucinations than prior systems. We hope our analysis framework and simple tool design inform future long-horizon agents.",
+      "tldr": "This paper addresses the challenge of long-horizon agentic search, where existing methods struggle due to context limitations and inefficiencies. The authors propose SLIM, a framework that separates search and browsing tasks and summarizes information periodically to keep context manageable. SLIM outperforms existing open-source systems in accuracy and efficiency, reducing errors and resource use in complex, multi-step web exploration tasks.",
+      "matched_topics": [
+        {
+          "topic": "AI as information curation tools such as search engines, news aggregators, etc.",
+          "relevance": 0.9,
+          "reason": "The paper focuses on agentic search frameworks and information management for long-horizon search tasks, which is directly related to AI as information curation tools."
+        }
+      ]
+    },
+    {
+      "id": "oai:arXiv.org:2511.17183v3",
+      "title": "Benchmarking Nighttime Traffic Sign Recognition with Illumination-Adaptive Detection and Semantic Attribute Reasoning",
+      "authors": [
+        "Aditya Mishra",
+        "Akshay Agarwal",
+        "Haroon Lone"
+      ],
+      "url": "https://arxiv.org/abs/2511.17183",
+      "abstract": "arXiv:2511.17183v3 Announce Type: replace-cross \nAbstract: Traffic signboards are vital for road safety and intelligent transportation systems. Yet, recognizing traffic signs at night remains underexplored due to the scarcity of real-world public datasets capturing low-light degradations and distractor classes. Existing benchmarks are predominantly daytime and do not reflect challenges such as headlight glare, motion blur, sensor noise, and vandalized or ambiguous signage. To address these gaps, we introduce INTSD, a large-scale nighttime traffic sign dataset collected across diverse regions of India. INTSD contains street-level images spanning 41 traffic signboard classes, multiple distractor categories, and varied lighting and weather conditions, designed to support both detection and fine-grained classification under nighttime scenarios. To benchmark INTSD, we conduct extensive evaluations using state-of-the-art detection and classification models under standardized protocols. Additionally, we present LENS-Net, a strong baseline that integrates an end-to-end adaptive illumination-aware detector with a multimodal classifier that fuses vision-language representations with soft semantic attribute reasoning over learnable shape and color embeddings. Experiments demonstrate that models trained exclusively on daytime data fail substantially under real nighttime conditions - a gap that is recovered once INTSD is introduced in training, even when controlling for data volume. These results validate INTSD as a complementary nighttime training resource and establish competitive baselines for future research. The code and dataset are publicly available.",
+      "tldr": "This paper introduces INTSD, a large dataset of nighttime traffic sign images from India, addressing the lack of real-world low-light data for traffic sign recognition. The authors propose LENS-Net, a model combining adaptive illumination detection with semantic reasoning to improve recognition in challenging night conditions. Their experiments show that training with INTSD significantly improves performance over models trained only on daytime data, highlighting the importance of nighttime-specific datasets.",
+      "matched_topics": [
+        {
+          "topic": "Methods and applications of using AI for image and video analysis",
+          "relevance": 0.9,
+          "reason": "The paper focuses on nighttime traffic sign recognition using image data and proposes a dataset and models for detection and classification, which is directly related to AI methods for image analysis."
+        }
+      ]
+    },
+    {
+      "id": "oai:arXiv.org:2604.26052v4",
+      "title": "From Prompt Risk to Response Risk: Paired Analysis of Safety Behavior of Large Language Models",
+      "authors": [
+        "Mengya Hu",
+        "Qiong Wei",
+        "Sandeep Atluri"
+      ],
+      "url": "https://arxiv.org/abs/2604.26052",
+      "abstract": "arXiv:2604.26052v4 Announce Type: replace \nAbstract: Safety evaluations of large language models (LLMs) typically report binary outcomes, i.e. attack success rate (ASR), refusal rate, or harmful versus safe classification, which hide how risk changes between prompt and response. We present a paired analysis over human labeled prompt and response records across four harm categories (Sexual, Self harm, Hate and Violence) and ordinal severity levels (Safe, Low, Medium, High). 61% of responses reduce harm relative to the prompt, 36% preserve severity, and 3% escalate. The escalation splits into two mechanisms: benign prompts triggering unrequested harmful detail, and answers that stay on task at higher severity than the prompt. Category decomposition shows that Sexual content exhibits the highest harm persistence in this sample, driven by compliance at the same severity rather than drift from benign inputs. Joint relevance analysis exposes a helpfulness versus harmlessness tradeoff: compliance escalations remain highly relevant, whereas safe responses include generic refusals with low relevance. A public supporting evaluation over 600 prompts and six models reproduces the framework's measurements and two directional signals, while few-shot LLM graders exhibit a prompt/response detection asymmetry that data calibration does not close. Grader prompts, public-evaluation artifacts, and analysis code are shared at https://github.com/microsoft/PairedSafety.",
+      "tldr": "This paper analyzes how large language models handle harmful prompts by comparing the risk level of the input prompt to the model's response across different harm categories. The study finds that most responses reduce harm, some maintain the same level, and a small portion escalate harm, often due to either adding unwanted harmful details or matching the prompt's severity. The research also highlights a tradeoff between helpfulness and safety, with safer responses tending to be less relevant, and provides publicly available tools and data for further evaluation.",
+      "matched_topics": [
+        {
+          "topic": "Security of AI and language models",
+          "relevance": 0.9,
+          "reason": "The paper focuses on safety evaluations of large language models, analyzing harmful content and risk escalation, which is directly related to security concerns in AI."
+        }
+      ]
+    },
+    {
+      "id": "oai:arXiv.org:2606.06715v2",
+      "title": "Does Topic Sentiment Cause Perceived Ideology? Comparing Human and LLM Annotations in Political News Articles",
+      "authors": [
+        "Upasana Chatterjee"
+      ],
+      "url": "https://arxiv.org/abs/2606.06715",
+      "abstract": "arXiv:2606.06715v2 Announce Type: replace \nAbstract: We ask whether topic sentiment has a causal effect on perceived political ideology, and whether the answer depends on who assigns the ideology label. Using articles from AllSides, paired with shared sentiment annotations from Llama-3.3-70b-versatile, we compare ideology labels from expert human annotators, GPT-4o-mini (baseline and finetuned), and Llama-3.3-70B. We apply Double Machine Learning (DML) and mediation analysis across all four annotation paradigms. Zero-shot LLMs regularly inflate effect sizes relative to human annotations, while fine-tuning often attenuates them back toward the human scale. Our results have implications for the use of LLM annotations as silver labels and as proxies for human judgment in downstream causal analyses: they may be reliable for recovering the presence and direction of effects on the partisan topics, but not their magnitude, leading to over- or under-prediction of some ideology given particular topics.",
+      "tldr": "This paper investigates whether the sentiment expressed on specific topics influences how people perceive political ideology, comparing labels assigned by humans and large language models (LLMs). Using advanced statistical methods on political news articles, the study finds that LLMs without fine-tuning tend to exaggerate the effect sizes, while fine-tuning brings their assessments closer to human judgments. The findings suggest that while LLMs can detect the presence and direction of ideological effects, they may misestimate their strength, affecting their reliability as substitutes for human annotations in causal analyses.",
+      "matched_topics": [
+        {
+          "topic": "Applications of AI and language models in social science research",
+          "relevance": 0.9,
+          "reason": "The paper studies the causal effect of topic sentiment on perceived political ideology using AI language models and human annotations, which is a direct application of AI in social science research."
+        }
+      ]
+    },
+    {
+      "id": "oai:arXiv.org:2606.20751v2",
+      "title": "From Sentiment to Actionable Insights: Public Sentiment Analysis of Advanced Air Mobility",
+      "authors": [
+        "Esrat Farhana Dulia",
+        "Amina Dhaher",
+        "Raiful Hasan",
+        "Syed Arbab Mohd Shihab"
+      ],
+      "url": "https://arxiv.org/abs/2606.20751",
+      "abstract": "arXiv:2606.20751v2 Announce Type: replace \nAbstract: Advanced Air Mobility (AAM) is an emerging low-altitude transportation system whose successful deployment depends on both technological progress and public acceptance. Public acceptance can influence government support, regulations, noise standards, willingness to fly, and the commercial viability of AAM. Understanding public sentiment is therefore essential for identifying societal barriers and developing effective adoption strategies. This study analyzes 306,009 human-generated texts collected from Reddit and Quora to examine AAM-related public discourse using artificial intelligence models. Seven sentiment-analysis approaches, including lexicon-based, machine-learning, deep-learning, and transformer models, are evaluated to identify the most reliable method for AAM-specific sentiment classification. ModernBERT achieves the highest performance and is used to label the full dataset. Latent Dirichlet Allocation is then applied within each sentiment class to identify underlying topics and examine their temporal evolution from 2008 to 2025. The analysis identifies 20 topics and six major cross-sentiment clusters: workforce and skill development, regulation and compliance, drone technical performance, military and geopolitical applications, safety and operational risks, and noise and disturbance. These findings can help policymakers, industry stakeholders, researchers, and operators develop targeted regulations, safety measures, workforce programs, noise-reduction strategies, and public communication efforts to address concerns and support the responsible deployment of AAM.",
+      "tldr": "This study analyzes over 300,000 public comments from Reddit and Quora to understand people's feelings about advanced air mobility (AAM) using various AI sentiment analysis methods, finding that ModernBERT works best. It then identifies key topics like safety, regulations, and noise concerns that shape public opinion. These insights can guide policymakers and industry leaders in addressing public worries and promoting the safe and accepted use of AAM technologies.",
+      "matched_topics": [
+        {
+          "topic": "Applications of AI and language models in social science research",
+          "relevance": 0.9,
+          "reason": "The paper applies AI and language models to analyze public sentiment and discourse on Advanced Air Mobility, which is a social science research application."
+        }
+      ]
+    },
+    {
+      "id": "oai:arXiv.org:2607.12195v1",
+      "title": "Comparing Semantic Navigation in Humans and Large Language Models using Natural Language Processing",
+      "authors": [
+        "Gabriel Paris-Colombo",
+        "Rodrigo M. Cabral-Carvalho",
+        "Felipe D. Toro-Hern\\'andez"
+      ],
+      "url": "https://arxiv.org/abs/2607.12195",
+      "abstract": "arXiv:2607.12195v1 Announce Type: new \nAbstract: Semantic memory retrieval can be conceptualized as navigation through conceptual space. We compared semantic search dynamics between humans and three large language models (GPT-4o, Gemini-2.5-Pro, Claude-Sonnet-4.5) using verbal fluency data. By applying trajectory-based NLP metrics to the items generated by 82 human participants and LLM output across eight temperature settings, we quantified three complementary dimensions: entropy (step size predictability), distance to next (successive semantic steps), and distance to centroid (global dispersion). Humans exhibited higher entropy, larger semantic steps and broader dispersion than all LLMs, indicating more variable and exploratory search. Temperature tuning produced only partial alignments, as individual metrics matched between humans and LLMs at specific settings, but no configuration reproduced the complete human profile (in all dimensions). These findings suggest that human semantic search implements a distinctive balance between local exploitation and global exploration that current model architectures fail to reproduce.",
+      "tldr": "This study compared how humans and advanced language models search through semantic memory by analyzing verbal fluency tasks. Using trajectory-based metrics, the researchers found that humans explore concepts more variably and broadly than the models, which showed more predictable and narrower search patterns. Adjusting model settings only partially matched human behavior, indicating current models don't fully capture the balance of exploration and exploitation seen in human semantic search.",
+      "matched_topics": [
+        {
+          "topic": "Using AI to simulate humans in various contexts",
+          "relevance": 0.9,
+          "reason": "The paper directly compares human semantic search behavior with that of large language models, effectively using AI to simulate and understand human cognitive processes."
+        }
+      ]
+    },
+    {
+      "id": "oai:arXiv.org:2607.12200v1",
+      "title": "A Threshold Exceedance Framework for CBRN Uplift Evaluation in Frontier Language Models",
+      "authors": [
+        "Rahul Gupta",
+        "Abhinav Mohanty",
+        "Payal Motwani",
+        "Venkatesh Saligrama",
+        "Satyapriya Krishna",
+        "Connor Harris",
+        "Gary Anthony Ackerman",
+        "Brandon Behlendorf",
+        "Tom Hobson",
+        "Theodore Wilson",
+        "..."
+      ],
+      "url": "https://arxiv.org/abs/2607.12200",
+      "abstract": "arXiv:2607.12200v1 Announce Type: cross \nAbstract: As frontier language models advance, policymakers and model developers need methods for assessing whether model access materially increases a non-expert actor's ability to plan high-consequence Chemical, Biological, Radiological, or Nuclear (CBRN) misuse relative to public tools alone. Existing CBRN evaluations differ in non-expert definitions, threat scope, baselines, scoring rubrics, and decision rules, making results difficult to compare across studies. We introduce a Threshold Exceedance Criteria (TEC) framework that decomposes an uplift study into independently executable components: determining non-expert participant eligibility, defining the CBRN threat scope for the study, and statistically estimating material uplift. We then operationalize the TEC framework in a large-scale empirical study using a design that determines two forms of uplift: generative (where a model assists plan creation from scratch) and revisionist (where a model assists refinement of an existing plan). The study produced attack plans across the CBRN domains, which we evaluated through subject-matter-expert review to estimate generative and revisionist uplift. Applying the framework, our empirical study revealed domain heterogeneity: under this controlled pre-release evaluation, model-assisted plans sometimes received expert-equivalent instructional ratings, but confirmed material uplift was limited to the radiological domain. These findings informed mitigation and deployment-governance decisions rather than characterizing deployed model behavior. We conclude with methodological lessons for future CBRN uplift evaluations, emphasizing prespecified criteria, explicit baselines, separation of generative and revisionist estimates, and careful distinction between preliminary screening signals and confirmed risk determinations.",
+      "tldr": "This paper presents a new framework to evaluate how much advanced language models help non-experts plan dangerous chemical, biological, radiological, or nuclear attacks compared to public tools. The authors conducted a large study where experts reviewed attack plans created or improved with model assistance, finding that significant risk increase was mainly seen in radiological scenarios. Their approach offers clear guidelines for future assessments to better inform safety and policy decisions.",
+      "matched_topics": [
+        {
+          "topic": "Security of AI and language models",
+          "relevance": 0.9,
+          "reason": "The paper focuses on evaluating the risk of language models increasing the ability to plan CBRN misuse, which is directly related to security concerns of AI."
+        }
+      ]
+    },
+    {
+      "id": "oai:arXiv.org:2607.12215v1",
+      "title": "Fine-Tuned Multi-Agent Framework for Detecting OCEAN in Life Narratives",
+      "authors": [
+        "Rasiq Hussain",
+        "Darshil Italiya",
+        "Joshua Oltmanns",
+        "Mehak Gupta"
+      ],
+      "url": "https://arxiv.org/abs/2607.12215",
+      "abstract": "arXiv:2607.12215v1 Announce Type: new \nAbstract: Accurately assessing personality from text is challenging because traits are latent, context-dependent, and often subtly expressed across long narratives. Large language models (LLMs) offer new opportunities by processing extensive textual contexts, but pretraining of these models can induce latent \"personality-like\" biases, making single-model inferences inconsistent. We propose a fine-tuned multi-agent framework for detecting OCEAN personality traits, in which sub-agents are conditioned to adopt high, low, or neutral perspectives for each trait through masked language modeling (MLM) and psychometric supervision. A judge LLM aggregates and compares sub-agent outputs to generate final trait predictions, capturing multiple complementary perspectives while mitigating individual model biases. We evaluate the framework on life narrative dataset through quantitative and qualitative experiments, including baselines, ablations, and inference quality analyses. Our approach offers a scalable and interpretable method for text-based personality inference, highlighting the benefits of multi-agent reasoning grounded in psychometric supervision.",
+      "tldr": "The paper introduces a new method that uses multiple specialized AI agents to better detect personality traits from long life stories. Each agent focuses on different trait perspectives, and a judge model combines their insights to improve accuracy and reduce bias. This approach outperforms single-model methods and provides clearer, more reliable personality assessments from text.",
+      "matched_topics": [
+        {
+          "topic": "Applications of AI and language models in social science research",
+          "relevance": 0.9,
+          "reason": "The paper focuses on detecting OCEAN personality traits from life narratives using AI, which is a direct application of AI in social science research, specifically personality psychology."
+        }
+      ]
+    },
+    {
+      "id": "oai:arXiv.org:2607.12257v1",
+      "title": "On-Device Deep Research at 4B: Exposure Bounds Faithfulness, Retrieval Bounds Coverage",
+      "authors": [
+        "Vinay Kumar Chaganti"
+      ],
+      "url": "https://arxiv.org/abs/2607.12257",
+      "abstract": "arXiv:2607.12257v1 Announce Type: cross \nAbstract: On-device research agents search a corpus, read sources, and write a cited brief on a personal laptop. Whether their citations are faithful, and at what cost, is unmeasured for a deployable small model. This study fixes one 4B generator on a 24 GB laptop and asks what makes its citations faithful. It separates two quantities usually reported as one number. Cited claim faithfulness asks whether the cited source supports the claim. Trustworthy coverage asks whether the agent also cites the right sources. The study crosses how much of each source the generator sees, 400 against 1500 characters, with the quality of the sources supplied, gold papers against retrieved papers. Two levers fall out, and they act on different outcomes. Exposure sets faithfulness. More of each source lifts faithfulness from 0.45 to 0.58 on retrieved sources and from 0.37 to 0.58 on gold sources, and the two settings converge, so faithfulness is bound by exposure, not by whether the source is correct. The exposure lift is robust to a second, independent judge; the exact convergence is tight under the primary judge and only approximate under the second. Retrieval sets coverage. Trustworthy coverage stays near 0.22 on retrieved sources at any exposure, because recall is held near 0.40, so exposure cannot fix which sources are cited. The extra exposure costs about 235 output tokens. The practical recipe is to raise per source exposure first, cheaply, and then treat retrieval recall as the only remaining lever.",
+      "tldr": "This study evaluates how well a small on-device AI model can produce faithful citations when summarizing research papers on a personal laptop. By varying how much of each source the model reads and the quality of those sources, the researchers found that reading more of each source improves citation faithfulness, while the ability to cite the right sources depends on retrieval quality. The key takeaway is to first increase the amount of source content the model processes to boost faithfulness, then focus on improving retrieval to enhance coverage.",
+      "matched_topics": [
+        {
+          "topic": "Methods to increase the factuality of language model response",
+          "relevance": 0.9,
+          "reason": "The paper studies factors affecting the faithfulness of citations generated by a language model, which relates directly to improving factuality of model responses."
+        },
+        {
+          "topic": "AI as information curation tools such as search engines, news aggregators, etc.",
+          "relevance": 0.8,
+          "reason": "The paper discusses on-device research agents that search corpora and cite sources, which relates to AI as information curation tools."
+        }
+      ]
+    },
+    {
+      "id": "oai:arXiv.org:2607.12631v1",
+      "title": "Can Induced Emotion Bias LLM Behaviors in Sequential Decision Making?",
+      "authors": [
+        "Minh Khoi Ho",
+        "Zihao Zhu",
+        "Runchuan Zhu",
+        "Levina Li",
+        "Zhiwen Fan",
+        "Zhangyang Wang",
+        "Junyuan Hong"
+      ],
+      "url": "https://arxiv.org/abs/2607.12631",
+      "abstract": "arXiv:2607.12631v1 Announce Type: new \nAbstract: As Large Language Models (LLMs) are increasingly deployed as autonomous agents in high-stakes domains, understanding contextual factors that may modulate their decision-making becomes critical. While LLMs are trained to perceive and resonate with users' emotions, it remains unclear whether induced emotion can influence their sequential decision-making. We investigate this question using the Iowa Gambling Task (IGT), a classic psychological paradigm for studying decision-making under uncertainty, combined with an imagination-based emotion induction procedure. We first validate the feasibility of this paradigm by confirming that LLMs can sense strong, distinguishable emotions from context and that LLM agents can learn from sequential interactions in a human-like pace. With the validated setup, we find that, different from humans, induced emotion does not significantly bias the decision dynamics of LLM agents on average. However, the effects of anger are conditioned: inducing anger makes LLM agents less sensitive to penalties for bad decisions, and in early stages of the game, anger can lower exploration, locking decisions into a few choices early. These findings reveal the subtle yet distinct effects of induced emotion on LLM decision-making compared to human behavior, and provide a tool for future research on affective modulation of LLM agents.",
+      "tldr": "This study explores whether emotions induced in large language models (LLMs) affect their decision-making in uncertain situations, using a psychological task called the Iowa Gambling Task. The researchers found that while LLMs can recognize emotions and learn from interactions, induced emotions generally do not bias their decisions like they do in humans. However, when anger is induced, LLMs become less sensitive to negative outcomes and tend to explore fewer options early on, showing a unique emotional influence on their behavior.",
+      "matched_topics": [
+        {
+          "topic": "Using AI to simulate humans in various contexts",
+          "relevance": 0.9,
+          "reason": "The paper investigates LLMs simulating human-like decision-making and emotional responses in a psychological task."
+        },
+        {
+          "topic": "Applications of AI and language models in social science research",
+          "relevance": 0.8,
+          "reason": "The paper uses LLMs to study decision-making under uncertainty and emotion induction, which relates to social science research methods."
+        }
+      ]
+    },
+    {
+      "id": "oai:arXiv.org:2607.12831v1",
+      "title": "Knowledgeless Language Models: Suppressing Parametric Recall for Evidence-Grounded Language Modeling",
+      "authors": [
+        "Roi Cohen",
+        "Yvan Carr\\'e",
+        "Nick Lechtenb\\\"orger",
+        "Hendrik Droste",
+        "Lucas Kerschke",
+        "Russa Biswas",
+        "Gerard de Melo",
+        "Jan Buys"
+      ],
+      "url": "https://arxiv.org/abs/2607.12831",
+      "abstract": "arXiv:2607.12831v1 Announce Type: new \nAbstract: Language models encode substantial factual knowledge in their parameters, which can lead to unreliable behavior when this knowledge is outdated, incomplete, or misaligned with the provided context. In this work, we study whether modifying the pretraining signal can systematically shift models away from parametric recall and toward evidence-grounded reasoning. We introduce Knowledge--''Less'' Language Models (KLLMs), a fundamentally different epistemic training paradigm for LLMs, which are pretrained on corpora in which named entities are anonymized, thereby removing a primary channel for entity-linked factual supervision. This intervention substantially reduces closed-book factual recall, while often improving performance on tasks where relevant information is provided as context. Across multiple model scales, KLLMs consistently outperform matched baselines on contextual question answering, fact verification, and hallucination detection benchmarks. Crucially, in retrieval-grounded settings with imperfect evidence, KLLMs show improved robustness and achieve up to 20--25\\% relative gains over standard language models. They further exhibit better calibration, with improved ECE, Brier score, and AUROC, as well as more reliable abstention behavior. Our results demonstrate that suppressing entity-linked supervision during pretraining induces a shift in epistemic behavior: KLLMs rely less on parametric knowledge and more on external evidence, leading to improved reliability under realistic conditions. This suggests that pretraining-time control over knowledge acquisition can complement retrieval-augmented and tool-based systems by providing a more evidence-sensitive base model.",
+      "tldr": "This paper introduces a new training approach for language models that removes direct factual knowledge by anonymizing named entities during pretraining. This method reduces the model's reliance on memorized facts and encourages it to depend more on provided evidence, leading to better performance and reliability in tasks like question answering and fact verification. The resulting models are more robust and calibrated, especially when dealing with imperfect or external information sources.",
+      "matched_topics": [
+        {
+          "topic": "Methods to increase the factuality of language model response",
+          "relevance": 0.9,
+          "reason": "The paper focuses on reducing parametric recall and improving evidence-grounded reasoning, which directly relates to increasing the factuality and reliability of language model responses."
+        }
+      ]
+    },
+    {
+      "id": "oai:arXiv.org:2412.15239v4",
+      "title": "Modeling Story Expectations: A Generative Framework using LLMs",
+      "authors": [
+        "Hortense Fong",
+        "George Gui",
+        "Bo Yang"
+      ],
+      "url": "https://arxiv.org/abs/2412.15239",
+      "abstract": "arXiv:2412.15239v4 Announce Type: replace \nAbstract: Consumers' engagement with stories is shaped by their expectations about what will happen next, yet modeling these forward-looking beliefs over unstructured narrative content has remained challenging. We develop a framework that uses large language models to approximate consumers' story expectations. Our method generates multiple imagined story continuations from a pre-trained LLM and extracts interpretable, theory-motivated features from these continuations, such as emotion and narrative path features. We propose two complementary validation procedures suited to different data availability: a survey-based approach that compares LLM-derived expectations to human-reported beliefs, and a rational-expectations approach that compares them to actual story outcomes. Applying the framework to both survey data collected in a controlled lab setting and observational data from an online reading platform, we find that LLM-derived expectations correlate with human-reported beliefs as well as actual story continuations along all features studied. In both settings, forward-looking expectations are associated with reader engagement above and beyond features of the content already consumed. Our framework provides a scalable method for modeling consumer beliefs about narrative content, with implications for content creation, platform strategy, and the study of narrative media.",
+      "tldr": "This paper presents a new method that uses large language models to predict what readers expect to happen next in stories by generating possible continuations and analyzing features like emotions and plot paths. The approach was validated by comparing these predictions to both human survey responses and actual story outcomes, showing strong alignment. The findings reveal that these forward-looking expectations help explain reader engagement beyond just the story content already seen.",
+      "matched_topics": [
+        {
+          "topic": "Applications of AI and language models in social science research",
+          "relevance": 0.8,
+          "reason": "The paper applies large language models to model consumer expectations and engagement with stories, which is a social science research application."
+        }
+      ]
+    },
+    {
+      "id": "oai:arXiv.org:2501.05396v3",
+      "title": "FairCoder: Probing LLM Bias in High-Stakes Decision Making via Coding Tasks",
+      "authors": [
+        "Yongkang Du",
+        "Jen-tse Huang",
+        "Jieyu Zhao",
+        "Lu Lin"
+      ],
+      "url": "https://arxiv.org/abs/2501.05396",
+      "abstract": "arXiv:2501.05396v3 Announce Type: replace \nAbstract: Large language models (LLMs) are increasingly used in high-stakes decisions such as hiring and college admissions, making their social bias a critical concern. While LLMs are trained to refuse explicitly biased requests, bias can be leaked implicitly during LLM planning and reasoning process. As code becomes the primary medium for LLM internal logic-writing, we introduce FairCoder, a benchmark that frames decision-making as coding tasks to systematically probe LLM bias across employment, education, and healthcare domains, covering multiple fairness definitions. Considering that existing metrics may fail when LLMs frequently refuse the request, we propose FairScore, a metric that jointly captures refusal behavior and group-level outcome diversity. Experiments with a 1k-sample dataset on powerful LLMs reveal consistent and previously underexplored bias patterns, such as prioritizing applicants from high-income families in college admissions. Our findings highlight the risks of deploying LLMs as decision-making agents and provide a comprehensive evaluation framework for future research.",
+      "tldr": "This paper introduces FairCoder, a new way to test biases in large language models by having them perform coding tasks related to important decisions like hiring and college admissions. The authors also propose FairScore, a metric that measures both how often models refuse biased requests and how outcomes differ across groups. Their experiments reveal hidden biases, such as favoring applicants from wealthy families, highlighting risks in using these models for critical decisions.",
+      "matched_topics": [
+        {
+          "topic": "Applications of AI and language models in social science research",
+          "relevance": 0.8,
+          "reason": "The paper applies LLMs to social domains like hiring, education, and healthcare, which are key areas in social science research."
+        }
+      ]
+    },
+    {
+      "id": "oai:arXiv.org:2511.09008v2",
+      "title": "A Neurosymbolic Approach to Natural Language Formalization and Verification",
+      "authors": [
+        "Chenyang An",
+        "Sam Bayless",
+        "Stefano Buliani",
+        "Darion Cassel",
+        "Byron Cook",
+        "Duncan Clough",
+        "R\\'emi Delmas",
+        "Nafi Diallo",
+        "Ferhat Erata",
+        "Nick Feng",
+        "..."
+      ],
+      "url": "https://arxiv.org/abs/2511.09008",
+      "abstract": "arXiv:2511.09008v2 Announce Type: replace \nAbstract: Large Language Models perform well at natural language interpretation and reasoning, but their lack of formal correctness guarantees limits their adoption in regulated industries like finance and health-care that operate under strict policies. To address this limitation, we launched Automated Reasoning checks (ARc): a public service that (1) uses LLMs with optional human guidance to formalize natural language policies, allowing fine-grained control of the formalization process, and (2) uses inference-time autoformalization to validate logical correctness of natural language statements against those policies. ARc performs multiple redundant formalization steps at inference time, checking the formalizations for semantic equivalence. Our benchmarks show that ARc exceeds 99% soundness and achieves a near-zero false positive rate in identifying logical validity. Our approach produces auditable artifacts that substantiate the verification outcomes and can be used to improve the original text. ARc is the first commercial offering from a major cloud provider to integrate automated reasoning into a generative AI guardrail.",
+      "tldr": "This paper presents ARc, a system that combines large language models with human input to convert natural language policies into formal logic, enabling precise verification of statements against these policies. By performing multiple checks to ensure consistency, ARc achieves over 99% accuracy and almost no false positives in validating logical correctness. This approach provides transparent, auditable results and is the first commercial tool from a major cloud provider to integrate automated reasoning as a safety measure in AI applications.",
+      "matched_topics": [
+        {
+          "topic": "Security of AI and language models",
+          "relevance": 0.8,
+          "reason": "The paper discusses formal correctness guarantees and automated reasoning checks to ensure logical validity, which relates to security and reliability of AI systems."
+        }
+      ]
+    },
+    {
+      "id": "oai:arXiv.org:2601.11443v3",
+      "title": "Predict the Retrieval! Test time adaptation for Retrieval Augmented Generation",
+      "authors": [
+        "Xin Sun",
+        "Zhongqi Chen",
+        "Qiang Liu",
+        "Shu Wu",
+        "Bowen Song",
+        "Weiqiang Wang",
+        "Zilei Wang",
+        "Liang Wang"
+      ],
+      "url": "https://arxiv.org/abs/2601.11443",
+      "abstract": "arXiv:2601.11443v3 Announce Type: replace \nAbstract: Retrieval-Augmented Generation (RAG) has emerged as a powerful approach for enhancing large language models' question-answering capabilities through the integration of external knowledge. However, when adapting RAG systems to specialized domains, challenges arise from distribution shifts, resulting in suboptimal generalization performance. In this work, we propose TTARAG, a test-time adaptation method that dynamically updates the language model's parameters during inference to improve RAG system performance in specialized domains. Our method introduces a simple yet effective approach where the model learns to predict retrieved content, enabling automatic parameter adjustment to the target domain. Through extensive experiments across six specialized domains, we demonstrate that TTARAG achieves substantial performance improvements over baseline RAG systems. Code available at https://github.com/sunxin000/TTARAG.",
+      "tldr": "This paper introduces a method called TTARAG that improves question-answering models by updating them during testing to better handle specialized topics. The approach involves the model learning to predict the information it retrieves, allowing it to adjust itself to new domains on the fly. Experiments show that TTARAG significantly boosts performance compared to standard retrieval-augmented models across various specialized fields.",
+      "matched_topics": [
+        {
+          "topic": "AI as information curation tools such as search engines, news aggregators, etc.",
+          "relevance": 0.8,
+          "reason": "The paper discusses Retrieval-Augmented Generation, which involves retrieving external knowledge to augment language model generation, closely related to AI as information curation tools."
+        }
+      ]
+    },
+    {
+      "id": "oai:arXiv.org:2606.27443v2",
+      "title": "When Does Personality Composition Matter for Multi-Agent LLM Teams?",
+      "authors": [
+        "Aryan Keluskar",
+        "Amrita Bhattacharjee",
+        "Huan Liu"
+      ],
+      "url": "https://arxiv.org/abs/2606.27443",
+      "abstract": "arXiv:2606.27443v2 Announce Type: replace-cross \nAbstract: Personality prompting shapes how large language models communicate, yet whether these behavioral shifts affect objective task outcomes remains under-explored. Prior work shows that agents prompted with low agreeableness produce adversarial language, while those prompted with high agreeableness become cooperative, but the relationship between communication style and task performance has not been systematically examined across multiple domains. In this work, we investigate whether personality composition matters for multi-agent team performance by manipulating personality traits across frontier LLMs on three task domains: structured coding, open-ended research collaboration, and competitive bargaining. We find that personality effects depend critically on task structure. In coding tasks, low agreeableness leads to large communication shifts that have little effect on milestone completion. In open-ended collaboration and bargaining, the same manipulation substantially degrades performance. We discuss implications for multi-agent system design and the limits of personality manipulation.",
+      "tldr": "This paper studies how changing the personality traits of large language model agents affects their teamwork on different tasks. By adjusting traits like agreeableness, the authors tested teams on coding, research collaboration, and bargaining tasks. They found that personality changes impact performance differently depending on the task, with little effect on coding but significant effects on collaboration and bargaining outcomes.",
+      "matched_topics": [
+        {
+          "topic": "Using AI to simulate humans in various contexts",
+          "relevance": 0.8,
+          "reason": "The paper manipulates personality traits in LLM agents to study communication and team performance, which involves simulating human-like personalities and interactions."
+        }
+      ]
+    },
+    {
+      "id": "oai:arXiv.org:2607.11020v2",
+      "title": "Can a Language Model Learn Facts Continually in Its Weights?",
+      "authors": [
+        "Charles O'Neill"
+      ],
+      "url": "https://arxiv.org/abs/2607.11020",
+      "abstract": "arXiv:2607.11020v2 Announce Type: replace \nAbstract: Continual learning promises a language model that keeps acquiring knowledge after training, with each new fact written into its weights. Whether weight writes can support accumulation remains undecided. We follow invented facts written into Qwen3 models from creation through sequences of twenty to one hundred later writes, using held-out questions of five types, with the original model given the fact in its prompt as the reference. Across these experiments, the breadth of the training data determines the kind of knowledge created. Bare-statement training produces recitation, while diverse restatements reduce the recitation-to-use gap from 27.4 to 5.4 points without showing the model a conclusion. This difference carries into later writes: after twenty sequential writes, bare-statement facts retain 1% accuracy while facts written from broad study data retain 46%. We also find that facts can be behaviourally forgotten without being erased. Forgotten facts keep most of the log-probability added by their write, and under bare-statement training 70% of wrong answers about them contain the most recently written fact. The same writes barely degrade the model's use of facts in context, and a forgotten study fact supplied in the prompt recovers to 77-80% on its questions. These results describe knowledge that is stored but question-keyed: later writes redirect the questions that reached it. Damage to unrelated abilities tracks KL divergence from the original model, and the later writes cause interference regardless of how the earlier fact was stored. Broad data can create usable knowledge, and a frozen reference can preserve capability, but no intervention we tested, including those built on accurate local measurements of each write, keeps earlier facts reachable. When facts must be composed or survive later writes, the reliable channel is context rather than the weights.",
+      "tldr": "This paper investigates whether language models can continually learn and retain new facts by updating their internal weights. By testing models with sequences of fact updates, the study finds that while diverse training data helps facts stick better, most newly learned facts are eventually forgotten or redirected by later updates. The authors conclude that relying on the model's context (prompts) is more reliable for maintaining knowledge over time than trying to store facts permanently in the model's weights.",
+      "matched_topics": [
+        {
+          "topic": "Methods to increase the factuality of language model response",
+          "relevance": 0.8,
+          "reason": "The paper studies how language models can continually learn and retain factual knowledge in their weights, which relates to improving the factual accuracy and knowledge retention of language model responses."
+        }
+      ]
+    },
+    {
+      "id": "oai:arXiv.org:2607.11464v1",
+      "title": "FAIR GraphRAG: A Retrieval-Augmented Generation Approach for Semantic Data Analysis",
+      "authors": [
+        "Marlena Fl\\\"uh",
+        "Soo-Yon Kim",
+        "Carolin Victoria Schneider",
+        "Sandra Geisler"
+      ],
+      "url": "https://arxiv.org/abs/2607.11464",
+      "abstract": "arXiv:2607.11464v1 Announce Type: cross \nAbstract: Retrieval-Augmented Generation (RAG) addresses the limitations of Large Language Models (LLMs) when providing responses to domain-specific questions. Graph-based RAG approaches, such as GraphRAG, enhance retrieval by capturing semantic relationships within knowledge graphs (KGs). While the FAIR principles (Findability, Accessibility, Interoperability, and Reusability) are becoming prevalent for scientific data management, especially in complex domains such as medicine, existing RAG approaches lack a structured FAIRification of the underlying knowledge resources. This lack limits their potential for FAIR information retrieval in these domains. To address this gap, we introduce FAIR GraphRAG, a novel framework that integrates FAIR Digital Objects (FDOs) as the fundamental units of a graph-based retrieval system. Each graph node represents an FDO that incorporates core data, metadata, persistent identifiers, and semantic links. We leverage LLMs to support schema construction and automated extraction of content and metadata from data sources. The framework was co-designed by physicians and computer scientists to ensure technical and clinical relevance. We apply FAIR GraphRAG to a biomedical dataset in gastroenterology, demonstrating its applicability to RNA-sequencing data. Beyond ensuring adherence to the FAIR principles, FAIR GraphRAG significantly improves question answering accuracy, coverage, and explainability, particularly for complex queries involving metadata and ontology links. This work shows the feasibility of combining FAIR data practices with graph-based retrieval techniques. We see potential for applying our approach to other specialized fields such as education and business.",
+      "tldr": "This paper presents a new method that improves how large language models answer complex, domain-specific questions by organizing data into FAIR Digital Objects within a graph structure. By combining these FAIR principles with graph-based retrieval and AI, the approach enhances accuracy, coverage, and explainability, especially in biomedical data analysis. The method was tested on RNA-sequencing data in gastroenterology, showing promising results and potential for use in other specialized fields.",
+      "matched_topics": [
+        {
+          "topic": "AI as information curation tools such as search engines, news aggregators, etc.",
+          "relevance": 0.8,
+          "reason": "The paper presents a graph-based retrieval system integrating FAIR Digital Objects to improve information retrieval and question answering, which relates to AI as information curation tools."
+        }
+      ]
+    },
+    {
+      "id": "oai:arXiv.org:2607.11889v1",
+      "title": "Scaling Point-in-Time Language Models",
+      "authors": [
+        "Bryan Kelly",
+        "Semyon Malamud",
+        "Johannes Schwab",
+        "Teng Andrea Xu"
+      ],
+      "url": "https://arxiv.org/abs/2607.11889",
+      "abstract": "arXiv:2607.11889v1 Announce Type: new \nAbstract: Large language models trained on unrestricted internet corpora inevitably embed information from the future, introducing lookahead bias that compromises the validity of backtests and causal inference in finance and the social sciences. Point-in-time language models--trained exclusively on text available up to each calendar date--eliminate this leakage by construction, but existing efforts typically produce models that lag substantially behind their unconstrained counterparts. We show that this performance gap can be substantially narrowed through scale. Training decoder-only transformers with up to 4 billion parameters on 1 trillion chronologically filtered tokens from FineWeb, we construct a sequence of monthly model checkpoints spanning 2013-2024. Across a range of common-sense reasoning and language understanding benchmarks, our models approach the performance of leading open-weight models of comparable size (e.g., Gemma-3-4B and LLaMA-7B) trained on temporally unrestricted data, although a performance gap remains on several tasks. Instruction fine-tuning via LoRA further improves downstream usability. We release the complete pipeline--including dataset construction, training infrastructure, and evaluation code--to enable reproducible point-in-time language modeling and to support research applications that require strict temporal validity.",
+      "tldr": "The paper addresses the problem of lookahead bias in language models caused by training on future data, which affects applications in finance and social sciences. By training large transformer models only on data available up to each point in time, the authors create \"point-in-time\" models that reduce this bias. Their approach, using up to 4 billion parameters and a trillion tokens, narrows the performance gap with standard models and provides tools for reproducible, temporally valid language modeling.",
+      "matched_topics": [
+        {
+          "topic": "Methods to increase the factuality of language model response",
+          "relevance": 0.8,
+          "reason": "The paper focuses on training language models on temporally filtered data to avoid future information leakage, which directly relates to improving the factuality and temporal validity of model responses."
+        }
+      ]
+    },
+    {
+      "id": "oai:arXiv.org:2607.11891v1",
+      "title": "CANDI: Contextual Alignment for Niche Domains Question Answering",
+      "authors": [
+        "Megha Chakraborty",
+        "Darssan L. Eswaramoorthi",
+        "Het Riteshkumar Shah",
+        "Madhur Thareja",
+        "Michelle A Ihetu",
+        "Harshul Raj Surana",
+        "Kaushik Roy",
+        "Amit Sheth"
+      ],
+      "url": "https://arxiv.org/abs/2607.11891",
+      "abstract": "arXiv:2607.11891v1 Announce Type: new \nAbstract: The deployment of large language models (LLMs) in specialized domains like medical diagnostics and financial advisory necessitates evaluating capabilities beyond general knowledge. Traditional question-answering benchmarks often fail to capture the nuanced contextual grounding, user awareness, and domain understanding these fields require. To address this, we introduce CANDI-QA (Contextual Alignment for Niche Domains Question Answering), a novel dataset evaluating LLMs on delivering accurate, context-sensitive, and user-aligned answers in specialized settings. CANDI-QA features expert-curated question-answer pairs structured into two categories: (1) Information Assistance Questions, which are direct, factual queries requiring precise extraction, and (2) Applied Inference Questions, which are multi-hop reasoning tasks needing situational inference to generate actionable insights. We evaluate over ten diverse language models, from compact open-source to state-of-the-art proprietary systems. As a robust baseline, we present MTSS-Net, a lightweight neuro-symbolic framework combining neural retrieval with rule-based reasoning. Our findings highlight the profound challenges of achieving contextual alignment in niche domains, revealing the limitations of current LLMs without enhanced contextual or symbolic integration. Ultimately, CANDI-QA serves as a critical benchmark for advancing research in context-aware language models, stimulating the development of robust, trustworthy AI for high-stakes domains.",
+      "tldr": "This paper introduces CANDI-QA, a new dataset designed to test how well large language models can provide accurate and context-aware answers in specialized fields like medicine and finance. The authors evaluate various language models using this dataset and propose MTSS-Net, a hybrid system combining neural retrieval with rule-based reasoning. Their results show that current models struggle with context alignment in niche domains, highlighting the need for improved methods that integrate contextual and symbolic understanding.",
+      "matched_topics": [
+        {
+          "topic": "Methods to increase the factuality of language model response",
+          "relevance": 0.8,
+          "reason": "The paper focuses on evaluating and improving language models' ability to provide accurate, context-sensitive, and user-aligned answers, which relates to increasing factuality in responses."
+        }
+      ]
+    },
+    {
+      "id": "oai:arXiv.org:2607.11894v1",
+      "title": "Graph-Based Detection of Disinformation Narrative Diffusion between Russian and Ukrainian Telegram Channels",
+      "authors": [
+        "Yuliia Vistak",
+        "Viktoriia Makovska",
+        "Vera Schmitt",
+        "Veronika Solopova"
+      ],
+      "url": "https://arxiv.org/abs/2607.11894",
+      "abstract": "arXiv:2607.11894v1 Announce Type: new \nAbstract: Detecting disinformation narratives on social media is challenging due to the scale of amplification, rapid evolution, and linguistic variability of online content. We propose a graph-based framework for identifying and analyzing disinformation narratives in Telegram ecosystems by combining weak supervision with propagation graph analysis. The approach aggregates semantically related claims into narrative-level clusters and models their diffusion across interconnected channels. This enables the detection of coordinated narrative amplification that is difficult to capture through post-level analysis alone. Our results demonstrate that integrating textual signals with network structure provides a scalable method for detecting disinformation narratives and offers insights into how they propagate within large-scale messaging environments.",
+      "tldr": "The paper introduces a new method that uses graph analysis and weak supervision to detect and study disinformation stories spreading on Telegram channels. By grouping related claims into narratives and tracking how they spread across channels, the approach uncovers coordinated efforts to amplify false information. This combined use of text and network data offers a scalable way to identify and understand disinformation campaigns in large messaging platforms.",
+      "matched_topics": [
+        {
+          "topic": "AI and language models for generating misinformation or fact-checking",
+          "relevance": 0.8,
+          "reason": "The paper focuses on detecting disinformation narratives using AI, which relates to fact-checking and misinformation detection."
+        }
+      ]
+    },
+    {
+      "id": "oai:arXiv.org:2607.11933v1",
+      "title": "Transforming LLMs into Efficient Cross-Encoders via Knowledge Distillation for RAG Reranking",
+      "authors": [
+        "Shreeya Dasa Lakshminath",
+        "Shubhan S"
+      ],
+      "url": "https://arxiv.org/abs/2607.11933",
+      "abstract": "arXiv:2607.11933v1 Announce Type: new \nAbstract: Cross-encoders achieve high reranking accuracy in Retrieval-Augmented Generation (RAG) pipelines but impose quadratic inference costs that limit real-time deployment. We address this by fine-tuning LLaMA 3 (8B) as a drop-in reranker using a two-stage pipeline: supervised fine-tuning on a custom query-document relevance dataset via the Unsloth framework with LoRA adapters, followed by 4-bit quantization for efficient inference. The resulting model replaces the cross-encoder in a dual-retriever RAG pipeline combining BM25 and dense vector search. Evaluated on a domain-specific question-answering benchmark using the RAGAS framework, our fine-tuned LLaMA 3 reranker achieves gains of 14% in answer relevancy, 16% in context precision, 19% in answer similarity, and 21% in answer correctness over the cross-encoder baseline, while reducing inference overhead through 4-bit quantization. These results demonstrate that instruction-tuned LLMs can be adapted into accurate, efficient rerankers without the quadratic complexity of traditional cross-encoders.",
+      "tldr": "The paper presents a method to make large language models more efficient for reranking in retrieval-augmented generation tasks by fine-tuning LLaMA 3 with a two-stage process and applying 4-bit quantization. This approach significantly improves answer quality metrics while reducing computational costs compared to traditional cross-encoders. The results show that instruction-tuned LLMs can serve as accurate and faster rerankers without the usual heavy inference overhead.",
+      "matched_topics": [
+        {
+          "topic": "AI as information curation tools such as search engines, news aggregators, etc.",
+          "relevance": 0.8,
+          "reason": "The paper focuses on improving reranking in Retrieval-Augmented Generation pipelines, which are related to information retrieval and curation, making it relevant to AI as information curation tools."
+        }
+      ]
+    },
+    {
+      "id": "oai:arXiv.org:2607.12048v1",
+      "title": "An Empirical Analysis of Continual Learning for Heterogeneous Medical Visual Question Answering",
+      "authors": [
+        "Mai A. Shaaban",
+        "Tausifa Jan Saleem",
+        "Alaa Mohamed",
+        "Dilnaz Utemissova",
+        "Ufaq Khan",
+        "Mohammad Yaqub"
+      ],
+      "url": "https://arxiv.org/abs/2607.12048",
+      "abstract": "arXiv:2607.12048v1 Announce Type: cross \nAbstract: Deploying medical visual question answering (MedVQA) systems in real-world clinical settings requires models that adapt to new clinical tasks without forgetting previously acquired knowledge. Continual learning (CL) provides a practical framework for this setting. Despite rapid progress in medical vision-language models, the behavior of CL methods when training these models across heterogeneous MedVQA tasks remains underexplored. This work presents a systematic evaluation of CL for MedVQA across diverse clinical objectives, including classification, multi-label classification, detection, cell counting, and report generation. Specifically, we explore (1) the ability of existing CL methods to mitigate catastrophic forgetting; (2) their sensitivity to task ordering, analyzing how different task sequences influence performance retention and forgetting; and (3) the evolution of low-rank adaptation parameters as new tasks are learned, revealing patterns of weight drift under different CL methods. Our findings suggest that existing CL methods struggle to maintain stability-plasticity balance when tasks with different objectives and supervision formats are interleaved. Code and full experimental setup will be publicly available.",
+      "tldr": "This paper evaluates how well continual learning methods help medical visual question answering models adapt to various clinical tasks without forgetting previous knowledge. The study tests different tasks like classification and report generation, examining how task order affects learning and how model parameters change over time. The main finding is that current continual learning approaches struggle to balance learning new tasks and retaining old knowledge when tasks are diverse and mixed.",
+      "matched_topics": [
+        {
+          "topic": "Methods and applications of using AI for image and video analysis",
+          "relevance": 0.8,
+          "reason": "The paper focuses on medical visual question answering, which involves image analysis combined with language models, specifically in medical imaging contexts."
+        }
+      ]
+    },
+    {
+      "id": "oai:arXiv.org:2607.12310v1",
+      "title": "LakeQuest: A Three-Domain Benchmark for Grounded Question Answering across Data Lakes",
+      "authors": [
+        "Michael Solodko",
+        "Steven Gong",
+        "Guangwei Yu",
+        "Satya Krishna Gorti",
+        "Jesse C. Cresswell",
+        "Victor Zhong"
+      ],
+      "url": "https://arxiv.org/abs/2607.12310",
+      "abstract": "arXiv:2607.12310v1 Announce Type: new \nAbstract: While modern question answering (QA) systems excel on clean, schema-aligned corpora, real-world knowledge is rarely so neatly packaged. Answering questions over enterprise and scientific data lakes requires systems to navigate heterogeneous, weakly structured collections of tables, passages, and linked metadata. Current benchmarks abstract away this noisy discovery process, failing to evaluate end-to-end performance. To bridge this gap, we introduce LakeQuest, a human-validated benchmark of 9,846 QA pairs designed to evaluate the end-to-end retrieve-and-synthesize pipeline over realistic data lakes. LakeQuest spans three diverse domains (AI/ML metadata, retail banking, and multimodal biomedical drug information) and pairs every question with exact, modality-aware evidence pointers. By isolating source discovery from cross-modal synthesis, LakeQuest exposes critical failure modes in modern QA systems. Our baseline evaluations, including standard Retrieval-Augmented Generation (RAG) and agentic tool-use methods, reveal that high-quality retrieval does not guarantee correct reasoning. Systems consistently struggle with relation chaining in metadata graphs, policy grounding in bank ledgers, and joint tabular QA in biomedical contexts, highlighting the need for robust discovery and faithful cross-file composition mechanisms in future agentic QA systems.",
+      "tldr": "This paper introduces LakeQuest, a new benchmark with nearly 10,000 question-answer pairs designed to test how well QA systems can find and combine information from messy, real-world data lakes across three different fields. The benchmark highlights that even when retrieval is good, current systems often fail at reasoning tasks like linking related data and understanding complex policies. This shows a need for better methods that can accurately discover and integrate information from diverse and unstructured sources.",
+      "matched_topics": [
+        {
+          "topic": "AI as information curation tools such as search engines, news aggregators, etc.",
+          "relevance": 0.8,
+          "reason": "The paper focuses on QA systems that retrieve and synthesize information from heterogeneous data lakes, which is closely related to AI as information curation tools."
+        }
+      ]
+    },
+    {
+      "id": "oai:arXiv.org:2607.12334v1",
+      "title": "QUBO-Optimized Evidence Selection for Retrieval-Augmented Question Answering with Unconventional Solvers",
+      "authors": [
+        "Rahul Singh",
+        "Madhav Vadlamani"
+      ],
+      "url": "https://arxiv.org/abs/2607.12334",
+      "abstract": "arXiv:2607.12334v1 Announce Type: new \nAbstract: Retrieval-augmented question answering depends on selecting evidence passages that jointly support answer generation. However, many RAG pipelines rely on top-\\(k\\) ranking, where passages are selected mainly by individual relevance scores, even though multi-hop questions often require complementary evidence satisfying multiple information requirements. Recent LLM-based selectors address this by treating retrieval as set selection, but using an LLM for this intermediate stage can be costly and difficult to scale. In this work, we formulate evidence selection as a Quadratic Unconstrained Binary Optimization (QUBO) problem. Given a question, candidate passages, and decomposed information requirements, our method constructs an energy function that balances relevance, requirement coverage, support strength, redundancy, complementarity, and compactness. Low-energy solutions correspond to compact evidence subsets that cover the needed requirements while avoiding unnecessary or repetitive context. The selected passages are then passed to a downstream language model for answer generation, separating combinatorial evidence selection from semantic answer generation. We evaluate the proposed QUBO selector on HotpotQA and compare it with LLM-based set selectors and non-LLM baselines including BM25, relevance top-\\(k\\), maximal marginal relevance, hybrid lexical--semantic ranking, greedy coverage, and random selection. The QUBO selector achieves competitive exact-match and token-F1 performance relative to LLM-based selectors while providing a solver-compatible formulation for structured evidence selection. These results suggest that multi-hop evidence selection can be cast as discrete optimization, opening a path toward RAG pipelines where LLMs are reserved for semantic processing and answer generation, while context selection is handled by Ising/QUBO-compatible solvers.",
+      "tldr": "This paper introduces a new method for selecting evidence passages in question answering by formulating the task as a Quadratic Unconstrained Binary Optimization (QUBO) problem. Their approach balances multiple factors like relevance and coverage to choose compact, complementary evidence sets without relying heavily on large language models (LLMs) for selection. Experiments show that this method performs competitively with LLM-based selectors while enabling more efficient and structured evidence selection.",
+      "matched_topics": [
+        {
+          "topic": "AI as information curation tools such as search engines, news aggregators, etc.",
+          "relevance": 0.8,
+          "reason": "The paper focuses on evidence selection for retrieval-augmented question answering, which is a form of information curation and retrieval."
+        }
+      ]
+    },
+    {
+      "id": "oai:arXiv.org:2607.12383v1",
+      "title": "Beyond Binary Detection: A Multi-Dimensional Taxonomy of Cancer Misinformation on Reddit",
+      "authors": [
+        "Aria Pessianzadeh",
+        "Pooriya Jamie",
+        "Naima Sultana",
+        "Georgia Himmelstein",
+        "Yuliya Zektser",
+        "Patricia Ganz",
+        "Homa Hosseinmardi",
+        "Amir Ghasemian",
+        "Rezvaneh Rezapour"
+      ],
+      "url": "https://arxiv.org/abs/2607.12383",
+      "abstract": "arXiv:2607.12383v1 Announce Type: new \nAbstract: Cancer-related discussions on social media provide an important space for information exchange and peer support, but also facilitate the spread of misinformation that may influence prevention, screening, and treatment decisions. Existing research on cancer misinformation often relies on narrow definitions, small-scale datasets, or binary labeling frameworks. We introduce a multi-dimensional taxonomy for characterizing cancer misinformation in Reddit discussions of breast, lung, colon, and prostate cancer. The taxonomy captures seven dimensions, including misinformation presence, information type, risk level, stance, and topical focus. Using expert-annotated data, we evaluate multiple large language models (LLMs) for scalable misinformation annotation and analyze cancer misinformation across Reddit communities. Our results show that cancer-related misinformation constitutes approximately 6\\% of Reddit cancer discussions, with substantial variation across communities and misinformation topics. Few-shot prompting substantially improves classification performance, particularly for nuanced taxonomy dimensions. We additionally identify recurring misinformation narratives centered on unsupported treatments, distrust of conventional medicine, and misleading claims about diagnosis and screening. Our taxonomy, dataset, and findings provide a foundation for multi-dimensional modeling of online cancer misinformation.",
+      "tldr": "This paper develops a detailed system to classify different types of cancer misinformation found in Reddit discussions about breast, lung, colon, and prostate cancers. By using expert-labeled data and testing large language models, the study finds that about 6% of these discussions contain misinformation, which varies by community and topic. The research highlights common false claims related to unproven treatments, distrust in conventional medicine, and misleading information about diagnosis and screening.",
+      "matched_topics": [
+        {
+          "topic": "AI and language models for generating misinformation or fact-checking",
+          "relevance": 0.8,
+          "reason": "The paper uses language models to detect and classify cancer misinformation, which relates to fact-checking and misinformation detection."
+        }
+      ]
+    },
+    {
+      "id": "oai:arXiv.org:2607.12787v1",
+      "title": "Do We Really Need Multimodal Emotion Language Models Larger Than 1B Parameters?",
+      "authors": [
+        "Kaiwen Zheng",
+        "Junchen Fu",
+        "Wenhao Deng",
+        "Hu Han",
+        "Joemon M. Jose",
+        "Xuri Ge"
+      ],
+      "url": "https://arxiv.org/abs/2607.12787",
+      "abstract": "arXiv:2607.12787v1 Announce Type: cross \nAbstract: Recent advances in multimodal large language models (MLLMs) have significantly improved the performance of multimodal emotion recognition (MER) and enabled interpretable description generation by jointly modeling video, audio, and language, etc. However, these performance improvements are often accompanied by an increase in model parameter size (e.g, at least 7B), which simultaneously incurs high computational costs and reduces inference efficiency, thereby hindering real-time deployment on resource-constrained platforms such as robots and mobile devices. This raises a fundamental question: do we really need the multimodal MER model larger than 1B parameters for high-quality MER?\n  In this paper, we challenge the assumption that larger models are inherently necessary and proposes a lightweight MER framework (called Light-MER), which achieves better and faster multimodal sentiment understanding and recognition through knowledge distillation. It can transfer knowledge from a strong, large-scale teacher model to a lightweight sub-billion-parameter student model, aiming to preserve rich multimodal emotion reasoning and recognition while substantially improving deployment efficiency. Specifically, we introduce two new optimization strategies to enhance knowledge transfer: (1) a new optimal transport loss that combines Sliced Wasserstein Distance with hidden-state alignment, and (2) a new multi-reward optimization strategy based on GRPO that balances MER performance and efficiency, aimed at further enhancing the learning capabilities of student models. Extensive experiments on nine benchmark datasets demonstrate that Light-MER achieves state-of-the-art performance while significantly improving inference efficiency. This highlights the strong potential of small multimodal emotion language models for future research. Code is available at https://github.com/GAIR-Lab/Light-MER.",
+      "tldr": "This paper introduces Light-MER, a lightweight multimodal emotion recognition model under 1 billion parameters that uses knowledge distillation from larger models to maintain high accuracy. It employs novel optimization techniques to improve knowledge transfer and balance performance with efficiency. Experiments show Light-MER achieves state-of-the-art results while being faster and more suitable for deployment on devices with limited resources.",
+      "matched_topics": [
+        {
+          "topic": "Methods and applications of using AI for image and video analysis",
+          "relevance": 0.8,
+          "reason": "The paper focuses on multimodal emotion recognition involving video, audio, and language, which relates to image and video analysis methods and applications."
+        }
+      ]
+    },
+    {
+      "id": "oai:arXiv.org:2607.12884v1",
+      "title": "Evaluating Large Language Models on Misconceptions in Multi-Turn Medical Conversations",
+      "authors": [
+        "Monica Munnangi",
+        "Saiph Savage"
+      ],
+      "url": "https://arxiv.org/abs/2607.12884",
+      "abstract": "arXiv:2607.12884v1 Announce Type: new \nAbstract: Patients seeking medical information often ask questions that embed incorrect assumptions or misconceptions. In such cases, safe medical communication requires not only answering the question, but identifying and correcting the underlying false belief. These interactions naturally unfold over multiple turns, a pattern now mirrored in interactions with LLMs. Yet current evaluation frameworks do not capture model behavior in these settings, where misconceptions can emerge, persist, or evolve over the course of a conversation. Whether LLMs can reliably correct such misconceptions over time remains largely unexamined. To study this, we introduce ThReadMed-QA, a multi-turn medical dialogue dataset of 2,437 patient-physician conversation threads comprising 8,204 question-answer pairs, derived from real patient interactions on AskDocs. This dataset enables systematic evaluation of whether models can detect and correct misconceptions under a multi-turn context. We evaluate five LLMs using a rubric-based LLM-as-a-Judge framework that scores responses based on their ability to identify and correct misconceptions. Our experiments reveal a consistent pattern: even frontier models that can address misconceptions in a single interaction degrade substantially over subsequent turns. GPT-5 and Claude-Haiku correct these false presuppositions around 85% on initial questions but drop to roughly 50% within two follow-ups. An oracle analysis replacing prior model outputs with physician responses shows that much of the degradation is driven by error propagation, while performance remains imperfect even under correct context. Even when models tend to correct misconceptions initially, their performance degrades substantially over later turns, leading to inconsistent and potentially unsafe guidance in patient-facing settings and highlighting the need for evaluation frameworks that capture multi-turn behavior.",
+      "tldr": "This paper introduces a new dataset of multi-turn medical conversations to test how well large language models (LLMs) can identify and correct patient misconceptions over multiple exchanges. The study finds that while top models like GPT-5 and Claude-Haiku perform well initially, their ability to correct false beliefs drops significantly in follow-up turns, leading to inconsistent and potentially unsafe advice. The results highlight the challenge of maintaining accurate medical guidance in ongoing dialogues and the need for better evaluation methods.",
+      "matched_topics": [
+        {
+          "topic": "Methods to increase the factuality of language model response",
+          "relevance": 0.8,
+          "reason": "The paper evaluates large language models on their ability to detect and correct misconceptions in multi-turn medical conversations, which relates to improving the factual accuracy and reliability of model responses."
+        }
+      ]
+    }
+  ]
+}
