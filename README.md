@@ -19,7 +19,7 @@ Export the API key for the provider you use:
 | `openrouter` | `OPENROUTER_API_KEY` |
 
 The key can be exported in your shell, or placed in a local `.env` file in the repo root (loaded automatically via python-dotenv; see `.env.example`).
-The `.env` file is gitignored.
+The `.env` file is gitignored, and shell-exported variables take precedence over it.
 
 ## Dependency
 
@@ -51,6 +51,8 @@ The digest is written to `digests/YYYY-MM-DD/`:
 If the digest for the day already exists, the run exits cleanly without spending API calls; use `--force` to regenerate.
 Other flags: `--config <path>` to use another config file, `--date YYYY-MM-DD` to label the output folder (the arXiv feed always returns the latest announcement).
 
+The `digests/` folder is gitignored: digests are local artifacts meant to be read in place (by you or by an agent), not committed.
+
 ## Automation
 
 The tool is designed to run unattended — e.g. a daily cron job:
@@ -59,6 +61,7 @@ The tool is designed to run unattended — e.g. a daily cron job:
 30 9 * * 1-5 cd /path/to/daily_arxiv_digest && uv run python main.py
 ```
 
+With the API key in `.env`, the cron entry needs no environment setup of its own.
 Repeated invocations on the same day are no-ops, so overlapping schedules or manual re-runs are safe.
 On days without arXiv announcements (weekends/holidays) it writes an empty digest so consumers can tell the run happened.
 

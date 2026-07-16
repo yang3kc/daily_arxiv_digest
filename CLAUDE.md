@@ -19,7 +19,7 @@ Daily arXiv Digest is a headless CLI tool that fetches papers from arXiv RSS fee
 ## Architecture
 
 ### Core Components
-- `main.py` - CLI entry point (argparse); handles the already-exists/`--force` check
+- `main.py` - CLI entry point (argparse); loads `.env`, handles the already-exists/`--force` check
 - `src/digest.py` - Pipeline orchestration: fetch → score → select → TL;DR → render/write
 - `src/rss.py` - ArxivRSS class handles fetching papers from arXiv RSS feeds
 - `src/llm.py` - Provider registry (`PROVIDERS`), `create_client()`, and LLMPaperReader (relevance scoring + TL;DR generation)
@@ -48,7 +48,7 @@ Papers are sorted by max relevance, descending. On days with no arXiv announceme
 
 ### Environment Requirements
 - API key env var matching `llm_provider`: `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, or `OPENROUTER_API_KEY`
-- Keys can live in a local `.env` file (gitignored, loaded via python-dotenv at entry points; template in `.env.example`)
+- Keys can live in a local `.env` file (gitignored, loaded via python-dotenv at entry points; template in `.env.example`); shell env vars take precedence
 - Python 3.12+ required
 - Uses `uv` package manager
 
