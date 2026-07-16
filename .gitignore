@@ -6,7 +6,7 @@ __pycache__/
 # Ignore data files
 *.json
 *.json.gz
-!config.json
+!config.example.json
 
 # Generated digests
 digests/

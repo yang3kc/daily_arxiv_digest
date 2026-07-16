@@ -31,6 +31,13 @@ def main():
     )
     args = parser.parse_args()
 
+    if not Path(args.config).exists():
+        print(
+            f"Config file '{args.config}' not found; "
+            "copy config.example.json to config.json and edit it."
+        )
+        return 1
+
     with open(args.config) as f:
         config = json.load(f)
 

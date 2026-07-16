@@ -33,8 +33,8 @@ uv sync
 
 ## Usage
 
-Modify the configuration file at `config.json`.
-Specifically, change the arXiv subjects you want to follow and the topics you are interested in.
+Copy `config.example.json` to `config.json` (the latter is gitignored, so your personal configuration stays local).
+Then change the arXiv subjects you want to follow and the topics you are interested in.
 You can also change the LLM provider and model; make sure the model supports structured output.
 
 Generate today's digest with:

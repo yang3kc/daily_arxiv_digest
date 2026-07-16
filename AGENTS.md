@@ -53,7 +53,7 @@ Papers are sorted by max relevance, descending. On days with no arXiv announceme
 - Uses `uv` package manager
 
 ### Key Configuration Files
-- `config.json` - arXiv subjects, research topics, `llm_provider` + `llm_model`, concurrency, `relevance_threshold`, `output_dir`
+- `config.json` - arXiv subjects, research topics, `llm_provider` + `llm_model`, concurrency, `relevance_threshold`, `output_dir`; gitignored — copy from the tracked `config.example.json`
 - `pyproject.toml` - Project dependencies and metadata
 
 ## Development Notes
