@@ -47,6 +47,7 @@ The digest is written to `digests/YYYY-MM-DD/`:
 
 - `digest.md` — human-readable digest, grouped by topic, with a TL;DR for each selected paper
 - `digest.json` — structured record (metadata, stats, and selected papers with scores and TL;DRs) for programmatic consumption
+- `scores.json` — raw relevance scores for every fetched paper against every topic, so you can re-filter at any threshold on the fly without re-scoring
 
 If the digest for the day already exists, the run exits cleanly without spending API calls; use `--force` to regenerate.
 Other flags: `--config <path>` to use another config file, `--date YYYY-MM-DD` to label the output folder (the arXiv feed always returns the latest announcement).

@@ -52,7 +52,7 @@ def main():
     print(
         f"Selected {stats['papers_selected']} of {stats['papers_fetched']} papers."
     )
-    print(f"Wrote {json_path} and {md_path}")
+    print(f"Wrote {json_path}, {md_path}, and {json_path.parent / 'scores.json'}")
     return 0
 
 

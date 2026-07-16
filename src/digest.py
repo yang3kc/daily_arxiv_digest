@@ -139,6 +139,46 @@ def build_digest(date_str, paper_df, selected_df, tldrs, config):
     }
 
 
+def build_scores(date_str, scored_df, config):
+    """Assemble the full scoring record: every paper with all topic judgements."""
+    papers = []
+    groups = [] if scored_df.empty else scored_df.groupby("id")
+    for paper_id, group in groups:
+        first = group.iloc[0]
+        papers.append(
+            {
+                "id": paper_id,
+                "title": first["title"],
+                "authors": list(first["authors"]),
+                "url": first["url"],
+                "abstract": first["abstract"],
+                "judgements": [
+                    {
+                        "topic": row["topic"],
+                        "relevance": row["relevance"],
+                        "reason": row["reason"],
+                    }
+                    for _, row in group.sort_values(
+                        "relevance", ascending=False
+                    ).iterrows()
+                ],
+            }
+        )
+    papers.sort(
+        key=lambda p: max((j["relevance"] for j in p["judgements"]), default=0),
+        reverse=True,
+    )
+    return {
+        "date": date_str,
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "provider": config["llm_provider"],
+        "model": config["llm_model"],
+        "arxiv_subjects": config["arxiv_subjects"],
+        "topics": config["topics"],
+        "papers": papers,
+    }
+
+
 def render_markdown(digest):
     """Render the digest record as a human-readable markdown document."""
     lines = [
@@ -184,13 +224,16 @@ def render_markdown(digest):
     return "\n".join(lines)
 
 
-def write_outputs(digest, output_dir):
+def write_outputs(digest, scores, output_dir):
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     json_path = output_dir / "digest.json"
     md_path = output_dir / "digest.md"
+    scores_path = output_dir / "scores.json"
     with open(json_path, "w") as f:
         json.dump(digest, f, indent=2, ensure_ascii=False)
+    with open(scores_path, "w") as f:
+        json.dump(scores, f, indent=2, ensure_ascii=False)
     md_path.write_text(render_markdown(digest))
     return json_path, md_path
 
@@ -203,7 +246,8 @@ def run_digest(config, date_str, output_dir):
         # arXiv publishes no updates on weekends/holidays; still write a record
         # so downstream consumers can tell the run happened.
         digest = build_digest(date_str, paper_df, pd.DataFrame(), {}, config)
-        json_path, md_path = write_outputs(digest, output_dir)
+        scores = build_scores(date_str, pd.DataFrame(), config)
+        json_path, md_path = write_outputs(digest, scores, output_dir)
         logger.log_activity("complete_run", "completed", {"papers_selected": 0})
         return digest, json_path, md_path
 
@@ -217,7 +261,8 @@ def run_digest(config, date_str, output_dir):
     selected_df = select_papers(scored_df, config["relevance_threshold"])
     tldrs = add_tldrs(llm_reader, paper_df, selected_df, config)
     digest = build_digest(date_str, paper_df, selected_df, tldrs, config)
-    json_path, md_path = write_outputs(digest, output_dir)
+    scores = build_scores(date_str, scored_df, config)
+    json_path, md_path = write_outputs(digest, scores, output_dir)
     logger.log_activity(
         "complete_run",
         "completed",

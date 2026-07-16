@@ -37,12 +37,13 @@ Daily arXiv Digest is a headless CLI tool that fetches papers from arXiv RSS fee
 2. Concurrently score every paper against every topic
 3. Select judgements with relevance ≥ `relevance_threshold`
 4. Generate one TL;DR per selected paper (a paper can match several topics)
-5. Write `digest.json` (structured record) and `digest.md` (rendered digest grouped by topic)
+5. Write `digest.json` (selected papers), `digest.md` (rendered digest grouped by topic), and `scores.json` (raw scores for every fetched paper, for re-filtering at any threshold without re-scoring)
 
-### Output Contract (digest.json)
-Top-level: `date`, `generated_at`, `provider`, `model`, `relevance_threshold`, `arxiv_subjects`, `topics`, `stats {papers_fetched, papers_selected}`, `papers[]`.
-Each paper: `id`, `title`, `authors[]`, `url`, `abstract`, `tldr`, `matched_topics[] {topic, relevance, reason}`.
-Papers are sorted by max relevance, descending. On days with no arXiv announcements an empty digest is still written.
+### Output Contract
+`digest.json` top-level: `date`, `generated_at`, `provider`, `model`, `relevance_threshold`, `arxiv_subjects`, `topics`, `stats {papers_fetched, papers_selected}`, `papers[]`.
+Each paper: `id`, `title`, `authors[]`, `url`, `abstract`, `tldr`, `matched_topics[] {topic, relevance, reason}` (only judgements ≥ threshold).
+`scores.json`: same metadata (no threshold/stats) with `papers[]` covering EVERY fetched paper; each has `judgements[] {topic, relevance, reason}` for ALL topics.
+Papers are sorted by max relevance, descending, in both files. On days with no arXiv announcements empty files are still written.
 
 ## Configuration
 
