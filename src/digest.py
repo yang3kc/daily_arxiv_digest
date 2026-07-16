@@ -238,6 +238,106 @@ def write_outputs(digest, scores, output_dir):
     return json_path, md_path
 
 
+def _load_tldr_cache(output_dir):
+    cache_path = Path(output_dir) / "tldrs.json"
+    if cache_path.exists():
+        with open(cache_path) as f:
+            return json.load(f)
+    return {}
+
+
+def _save_tldr_cache(output_dir, tldrs):
+    cache_path = Path(output_dir) / "tldrs.json"
+    with open(cache_path, "w") as f:
+        json.dump(tldrs, f, indent=2, ensure_ascii=False)
+
+
+def rethreshold_digest(config, date_str, output_dir, threshold):
+    """Rebuild digest.json/digest.md from a saved scores.json at a new threshold.
+
+    Skips fetching and scoring entirely; TL;DRs are reused from the existing
+    digest.json and only generated for papers newly above the threshold.
+    """
+    output_dir = Path(output_dir)
+    scores_path = output_dir / "scores.json"
+    if not scores_path.exists():
+        raise FileNotFoundError(
+            f"{scores_path} not found; run the full pipeline for this date first."
+        )
+    with open(scores_path) as f:
+        scores = json.load(f)
+
+    old_tldrs = _load_tldr_cache(output_dir)
+    json_path = output_dir / "digest.json"
+    if json_path.exists():
+        with open(json_path) as f:
+            for paper in json.load(f)["papers"]:
+                if paper.get("tldr"):
+                    old_tldrs.setdefault(paper["id"], paper["tldr"])
+
+    selected = []
+    for paper in scores["papers"]:
+        matched = [j for j in paper["judgements"] if j["relevance"] >= threshold]
+        if matched:
+            selected.append(
+                {
+                    "id": paper["id"],
+                    "title": paper["title"],
+                    "authors": paper["authors"],
+                    "url": paper["url"],
+                    "abstract": paper["abstract"],
+                    "tldr": old_tldrs.get(paper["id"], ""),
+                    "matched_topics": sorted(
+                        matched, key=lambda j: j["relevance"], reverse=True
+                    ),
+                }
+            )
+
+    missing = [p for p in selected if not p["tldr"]]
+    if missing:
+        llm_reader = LLMPaperReader(
+            config["llm_provider"],
+            config["llm_model"],
+            config["topics"],
+            config["timeout_seconds"],
+        )
+        tldrs = _run_concurrently(
+            llm_reader.write_tldr,
+            missing,
+            config["number_of_concurrent_tasks"],
+            "Writing TL;DRs",
+        )
+        tldr_map = {item["id"]: item["tldr"] for item in tldrs}
+        for paper in selected:
+            if not paper["tldr"]:
+                paper["tldr"] = tldr_map.get(paper["id"], "")
+        old_tldrs.update({k: v for k, v in tldr_map.items() if v})
+    _save_tldr_cache(output_dir, old_tldrs)
+
+    digest = {
+        "date": scores["date"],
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "provider": scores["provider"],
+        "model": scores["model"],
+        "relevance_threshold": threshold,
+        "arxiv_subjects": scores["arxiv_subjects"],
+        "topics": scores["topics"],
+        "stats": {
+            "papers_fetched": len(scores["papers"]),
+            "papers_selected": len(selected),
+        },
+        "papers": selected,
+    }
+    with open(json_path, "w") as f:
+        json.dump(digest, f, indent=2, ensure_ascii=False)
+    md_path = output_dir / "digest.md"
+    md_path.write_text(render_markdown(digest))
+    logger.log_activity(
+        "rethreshold", "completed", {"threshold": threshold, "selected": len(selected)}
+    )
+    return digest, json_path, md_path
+
+
 def run_digest(config, date_str, output_dir):
     """Run the full pipeline and write digest.json + digest.md to output_dir."""
     paper_df = fetch_papers(config)
@@ -263,6 +363,9 @@ def run_digest(config, date_str, output_dir):
     digest = build_digest(date_str, paper_df, selected_df, tldrs, config)
     scores = build_scores(date_str, scored_df, config)
     json_path, md_path = write_outputs(digest, scores, output_dir)
+    cache = _load_tldr_cache(output_dir)
+    cache.update({k: v for k, v in tldrs.items() if v})
+    _save_tldr_cache(output_dir, cache)
     logger.log_activity(
         "complete_run",
         "completed",

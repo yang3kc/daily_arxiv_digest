@@ -52,6 +52,14 @@ The digest is written to `digests/YYYY-MM-DD/`:
 If the digest for the day already exists, the run exits cleanly without spending API calls; use `--force` to regenerate.
 Other flags: `--config <path>` to use another config file, `--date YYYY-MM-DD` to label the output folder (the arXiv feed always returns the latest announcement).
 
+To re-render the digest at a different threshold without re-fetching or re-scoring:
+
+```sh
+uv run python main.py --rethreshold 0.9
+```
+
+This rebuilds `digest.md`/`digest.json` from the saved `scores.json`; TL;DRs are cached in `tldrs.json`, so changing the threshold back and forth costs no API calls once a paper's TL;DR has been generated.
+
 The `digests/` folder is gitignored: digests are local artifacts meant to be read in place (by you or by an agent), not committed.
 
 ## Automation

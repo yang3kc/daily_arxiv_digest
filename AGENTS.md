@@ -11,6 +11,7 @@ Daily arXiv Digest is a headless CLI tool that fetches papers from arXiv RSS fee
 ### Development and Running
 - `make run` or `make all` - Generate today's digest
 - `uv run python main.py` - Direct command (flags: `--config`, `--date`, `--force`)
+- `uv run python main.py --rethreshold X` - Rebuild digest.md/digest.json from saved scores.json at threshold X (no fetch/re-score; TL;DRs cached in tldrs.json)
 - `uv sync` - Install/update dependencies
 
 ### Testing
@@ -43,6 +44,7 @@ Daily arXiv Digest is a headless CLI tool that fetches papers from arXiv RSS fee
 `digest.json` top-level: `date`, `generated_at`, `provider`, `model`, `relevance_threshold`, `arxiv_subjects`, `topics`, `stats {papers_fetched, papers_selected}`, `papers[]`.
 Each paper: `id`, `title`, `authors[]`, `url`, `abstract`, `tldr`, `matched_topics[] {topic, relevance, reason}` (only judgements ≥ threshold).
 `scores.json`: same metadata (no threshold/stats) with `papers[]` covering EVERY fetched paper; each has `judgements[] {topic, relevance, reason}` for ALL topics.
+`tldrs.json`: cache of `{paper_id: tldr}` accumulated across runs/rethresholds of the same date.
 Papers are sorted by max relevance, descending, in both files. On days with no arXiv announcements empty files are still written.
 
 ## Configuration
