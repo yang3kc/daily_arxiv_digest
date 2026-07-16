@@ -53,6 +53,16 @@ def score_papers(llm_reader, paper_df, config):
         "Scoring papers",
     )
     judgements = pd.concat(judgement_dfs)
+    if llm_reader.failure_count >= len(paper_dict_list):
+        logger.log_activity(
+            "llm_processing", "failed", {"failures": llm_reader.failure_count}
+        )
+        raise RuntimeError(
+            "Every scoring call failed; aborting instead of writing an empty digest. "
+            "Check the model name, API key, and provider settings."
+        )
+    if llm_reader.failure_count:
+        print(f"Warning: {llm_reader.failure_count} papers fell back to neutral scores")
     logger.log_activity(
         "llm_processing",
         "completed",

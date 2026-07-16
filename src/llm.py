@@ -99,17 +99,30 @@ class LLMPaperReader:
         self.client = create_client(provider, timeout_seconds)
         self.model = model
         self.topics = topics
+        # Some models (e.g. the GPT-5 family) only accept the default
+        # temperature; drop the parameter permanently on the first rejection.
+        self.use_temperature = True
+        self.failure_count = 0
 
     def _parse_completion(self, system_message, user_message, response_model):
-        response = self.client.chat.completions.parse(
-            model=self.model,
-            temperature=0.0,
-            messages=[
-                {"role": "system", "content": system_message},
-                {"role": "user", "content": user_message},
-            ],
-            response_format=response_model,
-        )
+        kwargs = {"temperature": 0.0} if self.use_temperature else {}
+        try:
+            response = self.client.chat.completions.parse(
+                model=self.model,
+                messages=[
+                    {"role": "system", "content": system_message},
+                    {"role": "user", "content": user_message},
+                ],
+                response_format=response_model,
+                **kwargs,
+            )
+        except OpenAIError as e:
+            if self.use_temperature and "temperature" in str(e):
+                self.use_temperature = False
+                return self._parse_completion(
+                    system_message, user_message, response_model
+                )
+            raise
         return response.choices[0].message.parsed
 
     def read_paper(self, paper, max_retries: int = 3):
@@ -141,6 +154,7 @@ class LLMPaperReader:
                 attempt += 1
                 if attempt >= max_retries:
                     # Construct a neutral judgement so downstream code keeps running
+                    self.failure_count += 1
                     topics = self.topics
                     if not isinstance(topics, list):
                         topics = [topics]
@@ -169,4 +183,5 @@ class LLMPaperReader:
                 return {"id": paper["id"], "tldr": parsed.tldr}
             except OpenAIError:
                 attempt += 1
+        self.failure_count += 1
         return {"id": paper["id"], "tldr": ""}
