@@ -4,7 +4,11 @@ import sys
 from datetime import date
 from pathlib import Path
 
+from dotenv import load_dotenv
+
 from src.digest import run_digest
+
+load_dotenv()
 
 
 def main():

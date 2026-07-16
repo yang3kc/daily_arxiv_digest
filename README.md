@@ -18,6 +18,9 @@ Export the API key for the provider you use:
 | `anthropic` | `ANTHROPIC_API_KEY` |
 | `openrouter` | `OPENROUTER_API_KEY` |
 
+The key can be exported in your shell, or placed in a local `.env` file in the repo root (loaded automatically via python-dotenv; see `.env.example`).
+The `.env` file is gitignored.
+
 ## Dependency
 
 The tool was developed under Python 3.12.

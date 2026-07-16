@@ -1,7 +1,11 @@
 import json
 
+from dotenv import load_dotenv
+
 from src.llm import LLMPaperReader
 from src.rss import ArxivRSS
+
+load_dotenv()
 
 with open("config.json") as f:
     config = json.load(f)

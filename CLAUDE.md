@@ -48,6 +48,7 @@ Papers are sorted by max relevance, descending. On days with no arXiv announceme
 
 ### Environment Requirements
 - API key env var matching `llm_provider`: `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, or `OPENROUTER_API_KEY`
+- Keys can live in a local `.env` file (gitignored, loaded via python-dotenv at entry points; template in `.env.example`)
 - Python 3.12+ required
 - Uses `uv` package manager
 
