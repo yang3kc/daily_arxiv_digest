@@ -7,7 +7,9 @@ __pycache__/
 *.json
 *.json.gz
 !config.json
-!digests/**/*.json
+
+# Generated digests
+digests/
 
 # C extensions
 *.so
