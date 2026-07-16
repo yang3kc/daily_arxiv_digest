@@ -5,13 +5,13 @@ all: run
 help:
 	@echo "Usage: make [target]"
 	@echo "Targets:"
-	@echo "  all - Run the streamlit app"
-	@echo "  run - Run the streamlit app"
+	@echo "  all - Generate today's digest"
+	@echo "  run - Generate today's digest"
 	@echo "  check-log - Check activity logs"
 	@echo "  help - Display this help message"
 
 run:
-	uv run streamlit run arxiv_digest.py
+	uv run python main.py
 
 check-log:
 	uv run python check_log.py

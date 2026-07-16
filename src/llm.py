@@ -1,8 +1,43 @@
+import os
+from typing import List
+
+import pandas as pd
 from openai import OpenAI, OpenAIError
 from pydantic import BaseModel, Field
-from typing import List
-import os
-import pandas as pd
+
+# Each provider is exposed through the OpenAI SDK: OpenRouter and Anthropic
+# both offer OpenAI-compatible endpoints, so one code path serves all three.
+PROVIDERS = {
+    "openai": {
+        "base_url": None,
+        "api_key_env": "OPENAI_API_KEY",
+    },
+    "anthropic": {
+        "base_url": "https://api.anthropic.com/v1/",
+        "api_key_env": "ANTHROPIC_API_KEY",
+    },
+    "openrouter": {
+        "base_url": "https://openrouter.ai/api/v1",
+        "api_key_env": "OPENROUTER_API_KEY",
+    },
+}
+
+
+def create_client(provider: str, timeout_seconds: float) -> OpenAI:
+    if provider not in PROVIDERS:
+        raise ValueError(
+            f"Unknown provider '{provider}'; expected one of {sorted(PROVIDERS)}"
+        )
+    settings = PROVIDERS[provider]
+    api_key = os.getenv(settings["api_key_env"])
+    if not api_key:
+        raise RuntimeError(
+            f"Provider '{provider}' requires the {settings['api_key_env']} "
+            "environment variable"
+        )
+    return OpenAI(
+        api_key=api_key, base_url=settings["base_url"], timeout=timeout_seconds
+    )
 
 
 class Judgement(BaseModel):
@@ -16,6 +51,12 @@ class Judgement(BaseModel):
 class Judgements(BaseModel):
     judgements: List[Judgement] = Field(
         description="A list of topics with relevance and reasoning"
+    )
+
+
+class Tldr(BaseModel):
+    tldr: str = Field(
+        description="A 2-3 sentence plain-language summary of the paper"
     )
 
 
@@ -40,37 +81,59 @@ class LLMPaperReader:
         Use your best guess when you are not sure.
     """
 
-    def __init__(self, model, topics, timeout_seconds):
-        self.client = OpenAI(
-            api_key=os.getenv("OPENAI_API_KEY"), timeout=timeout_seconds
-        )
+    tldr_system_message = """
+        You are a research assistant who writes concise paper summaries.
+        """
+
+    tldr_user_message = """
+        Please read the following paper title and abstract:
+        --------------
+        Title: {title}
+        Abstract: {abstract}
+        --------------
+        Write a 2-3 sentence TL;DR covering the key contribution, the method, and the main finding.
+        Use plain language; do not repeat the title.
+    """
+
+    def __init__(self, provider, model, topics, timeout_seconds):
+        self.client = create_client(provider, timeout_seconds)
         self.model = model
         self.topics = topics
+
+    def _parse_completion(self, system_message, user_message, response_model):
+        response = self.client.chat.completions.parse(
+            model=self.model,
+            temperature=0.0,
+            messages=[
+                {"role": "system", "content": system_message},
+                {"role": "user", "content": user_message},
+            ],
+            response_format=response_model,
+        )
+        return response.choices[0].message.parsed
 
     def read_paper(self, paper, max_retries: int = 3):
         """Read a single paper and return a judgement dataframe.
 
-        A few requests to the OpenAI API may fail temporarily (e.g. returning a
-        404 status).  To prevent a single failure from aborting the whole batch
-        run, this method retries the request a few times and falls back to a
-        neutral judgement when all retries fail.
+        A few requests to the API may fail temporarily.  To prevent a single
+        failure from aborting the whole batch run, this method retries the
+        request a few times and falls back to a neutral judgement when all
+        retries fail.
         """
 
         attempt = 0
         while attempt < max_retries:
             try:
-                response = self.client.responses.parse(
-                    model=self.model,
-                    temperature=0.0,
-                    instructions=self.system_message,
-                    input=self.user_message.format(
+                parsed = self._parse_completion(
+                    self.system_message,
+                    self.user_message.format(
                         title=paper["title"],
                         abstract=paper["abstract"],
                         topics=self.topics,
                     ),
-                    text_format=Judgements,
+                    Judgements,
                 )
-                judgements = response.output_parsed.model_dump()["judgements"]
+                judgements = parsed.model_dump()["judgements"]
                 paper_judgement_df = pd.DataFrame(judgements)
                 paper_judgement_df["id"] = paper["id"]
                 return paper_judgement_df
@@ -82,7 +145,28 @@ class LLMPaperReader:
                     if not isinstance(topics, list):
                         topics = [topics]
                     paper_judgement_df = pd.DataFrame(
-                        [{"topic": t, "relevance": 0.0, "reason": str(e)} for t in topics]
+                        [
+                            {"topic": t, "relevance": 0.0, "reason": str(e)}
+                            for t in topics
+                        ]
                     )
                     paper_judgement_df["id"] = paper["id"]
                     return paper_judgement_df
+
+    def write_tldr(self, paper, max_retries: int = 3):
+        """Generate a short TL;DR for a paper; empty string when all retries fail."""
+
+        attempt = 0
+        while attempt < max_retries:
+            try:
+                parsed = self._parse_completion(
+                    self.tldr_system_message,
+                    self.tldr_user_message.format(
+                        title=paper["title"], abstract=paper["abstract"]
+                    ),
+                    Tldr,
+                )
+                return {"id": paper["id"], "tldr": parsed.tldr}
+            except OpenAIError:
+                attempt += 1
+        return {"id": paper["id"], "tldr": ""}

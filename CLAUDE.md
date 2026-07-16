@@ -4,64 +4,59 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Daily arXiv Digest is a tool that uses OpenAI's ChatGPT to automatically filter and select interesting arXiv papers based on user-defined topics. It fetches papers from arXiv RSS feeds, evaluates them using LLM, and presents results through a Streamlit web interface.
+Daily arXiv Digest is a headless CLI tool that fetches papers from arXiv RSS feeds, uses an LLM to rate their relevance against user-defined topics, and writes a daily digest to `digests/YYYY-MM-DD/` as both markdown (for humans) and JSON (for agents). It is designed to run unattended in a cron job or be invoked by another agent.
 
 ## Commands
 
 ### Development and Running
-- `make run` or `make all` - Launch the Streamlit application
-- `uv run streamlit run arxiv_digest.py` - Direct command to run the app
+- `make run` or `make all` - Generate today's digest
+- `uv run python main.py` - Direct command (flags: `--config`, `--date`, `--force`)
 - `uv sync` - Install/update dependencies
 
 ### Testing
-- `python test_llm.py` - Run the basic integration test for RSS fetching and LLM processing
+- `uv run python test_llm.py` - Basic integration check: fetches one feed, scores one paper, writes one TL;DR
 
 ## Architecture
 
 ### Core Components
-- `arxiv_digest.py` - Main Streamlit application entry point
+- `main.py` - CLI entry point (argparse); handles the already-exists/`--force` check
+- `src/digest.py` - Pipeline orchestration: fetch → score → select → TL;DR → render/write
 - `src/rss.py` - ArxivRSS class handles fetching papers from arXiv RSS feeds
-- `src/llm.py` - LLMPaperReader class manages OpenAI API calls for paper evaluation
-- `src/utils.py` - Utility functions
+- `src/llm.py` - Provider registry (`PROVIDERS`), `create_client()`, and LLMPaperReader (relevance scoring + TL;DR generation)
+- `src/logger.py` - JSONL activity logging to `logs/activity.jsonl`; inspect with `check_log.py`
 
 ### Key Design Patterns
-- **Concurrent Processing**: Uses ThreadPoolExecutor with 50 concurrent tasks by default for parallel paper evaluation
-- **Error Resilience**: Implements retry logic with graceful fallbacks for API failures
-- **Structured Output**: Uses Pydantic models for type-safe JSON parsing of LLM responses
-- **Configuration-Driven**: All settings (topics, arXiv subjects, model parameters) are in `config.json`
+- **Idempotent runs**: Output is keyed by date; if `digests/<date>/digest.json` exists the run exits cleanly (exit 0) without API calls, unless `--force`
+- **Multi-provider via one code path**: OpenAI, Anthropic, and OpenRouter are all accessed through the OpenAI SDK (base_url override + per-provider API key env var); structured output via `chat.completions.parse` with Pydantic models
+- **Concurrent Processing**: ThreadPoolExecutor (50 workers by default) for both scoring and TL;DR phases
+- **Error Resilience**: Retry logic with graceful fallbacks — failed scoring returns neutral (0.0) judgements, failed TL;DRs return empty strings, so a batch never aborts
+- **Configuration-Driven**: All settings (topics, arXiv subjects, provider/model, threshold, output dir) are in `config.json`
 
 ### Data Flow
-1. Fetch papers from configured arXiv RSS feeds (`arxiv_subjects` in config.json)
-2. Concurrently evaluate papers using OpenAI API with structured prompts
-3. Display filtered results in Streamlit interface with relevance scores
+1. Fetch papers from configured arXiv RSS feeds (`arxiv_subjects` in config.json), deduplicate by id
+2. Concurrently score every paper against every topic
+3. Select judgements with relevance ≥ `relevance_threshold`
+4. Generate one TL;DR per selected paper (a paper can match several topics)
+5. Write `digest.json` (structured record) and `digest.md` (rendered digest grouped by topic)
+
+### Output Contract (digest.json)
+Top-level: `date`, `generated_at`, `provider`, `model`, `relevance_threshold`, `arxiv_subjects`, `topics`, `stats {papers_fetched, papers_selected}`, `papers[]`.
+Each paper: `id`, `title`, `authors[]`, `url`, `abstract`, `tldr`, `matched_topics[] {topic, relevance, reason}`.
+Papers are sorted by max relevance, descending. On days with no arXiv announcements an empty digest is still written.
 
 ## Configuration
 
 ### Environment Requirements
-- Requires `OPENAI_API_KEY` environment variable
+- API key env var matching `llm_provider`: `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, or `OPENROUTER_API_KEY`
 - Python 3.12+ required
 - Uses `uv` package manager
 
 ### Key Configuration Files
-- `config.json` - Contains arXiv subjects to monitor, research topics of interest, OpenAI model settings, and concurrency parameters
+- `config.json` - arXiv subjects, research topics, `llm_provider` + `llm_model`, concurrency, `relevance_threshold`, `output_dir`
 - `pyproject.toml` - Project dependencies and metadata
-
-### Current Configuration Focus
-- Monitors CS.CY (Computers and Society) and CS.CL (Computation and Language) arXiv categories
-- 7 specific AI/ML research topics focused on AI security, applications, and factuality
-- Uses GPT-4.1-mini model with 40-second timeout
 
 ## Development Notes
 
-### Threading Architecture
-- Project evolved from async to threading-based concurrency (see experiments in `exps/` directory)
-- Current implementation uses ThreadPoolExecutor for better reliability with OpenAI API
-
-### Error Handling Strategy
-- LLM evaluation failures return neutral scores to prevent batch failures
-- Implements retry logic for API timeouts and errors
-- Progress tracking in Streamlit interface shows real-time status
-
-### Experimental Development
-- `exps/` directory contains Jupyter notebooks with development iterations and concurrency experiments
-- Key notebooks: `structured_threading.ipynb`, `async.ipynb` show evolution of concurrent processing approach
+- The Streamlit UI was removed in the headless revamp; `digest.md` is the human-readable surface
+- The tool never commits its output; git handling of `digests/` is left to the scheduler/operator
+- `exps/` contains historical Jupyter notebooks from the async→threading concurrency evolution
