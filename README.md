@@ -73,14 +73,6 @@ Run a quick integration check (fetches one feed and scores one paper):
 uv run python test_llm.py
 ```
 
-To run the notebooks, you can use:
-
-```sh
-uv run --with notebook jupyter notebook
-```
-
-to leverage the local virtual environment.
-
 # Disclaimer
 
 This tool is mainly built for my personal use.

@@ -60,4 +60,3 @@ Papers are sorted by max relevance, descending. On days with no arXiv announceme
 
 - The Streamlit UI was removed in the headless revamp; `digest.md` is the human-readable surface
 - `digests/` is gitignored — outputs are local artifacts consumed in place by humans/agents
-- `exps/` contains historical Jupyter notebooks from the async→threading concurrency evolution

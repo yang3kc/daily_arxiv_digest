@@ -14,8 +14,8 @@
         "AI as information curation tools such as search engines, news aggregators, etc."
     ],
     "llm_provider": "openai",
-    "llm_model": "gpt-4.1-mini",
-    "number_of_concurrent_tasks": 50,
+    "llm_model": "gpt-5-mini",
+    "number_of_concurrent_tasks": 20,
     "timeout_seconds": 40,
     "relevance_threshold": 0.8,
     "output_dir": "digests"
