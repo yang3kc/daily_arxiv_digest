@@ -113,17 +113,35 @@ Pick whichever install approach fits your agent.
 
 ### Claude Code plugin (recommended)
 
-Add this repo as a plugin marketplace, then install the `arxiv-fetch` plugin —
-this registers the skill and keeps it updatable:
+This repo doubles as a Claude Code plugin marketplace. Add it, then install
+the `arxiv-fetch` plugin — this registers the skill and keeps it updatable:
 
 ```
 /plugin marketplace add yang3kc/daily_arxiv_digest
 /plugin install arxiv-fetch@daily-arxiv-digest
 ```
 
+The same works from the terminal: `claude plugin marketplace add
+yang3kc/daily_arxiv_digest`, then `claude plugin install
+arxiv-fetch@daily-arxiv-digest`.
+
 With this route, keep your config in the user-global location
 (`~/.config/arxiv-fetch/config.json`) — it survives plugin updates, unlike a
 config inside the skill folder (see the precedence above).
+
+#### Updates
+
+Skill updates ship as versioned
+[releases](https://github.com/yang3kc/daily_arxiv_digest/releases): the
+plugin version is pinned, so you get a new version exactly when a release is
+cut — commits between releases don't change your installed copy. To update:
+
+1. Run `/plugin` in Claude Code
+2. Switch to the **Marketplaces** tab
+3. Select **daily-arxiv-digest** and choose **Update marketplace**
+
+You can also **Enable auto-update** there to pick up new releases
+automatically.
 
 ### Copy without cloning
 
