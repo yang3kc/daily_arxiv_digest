@@ -42,8 +42,9 @@ DEFAULT_BASE_URL = "https://rss.arxiv.org/rss/"
 SKILL_DIR = Path(__file__).resolve().parents[1]
 XDG_CONFIG_HOME = Path(os.environ.get("XDG_CONFIG_HOME", "~/.config")).expanduser()
 CONFIG_SEARCH_CHAIN = [
+    Path.cwd() / ".arxiv-fetch" / "config.json",  # project-local (per-project interests)
     SKILL_DIR / "config.json",  # install-local (copy/clone installs)
-    XDG_CONFIG_HOME / "arxiv-fetch" / "config.json",  # universal; survives plugin updates
+    XDG_CONFIG_HOME / "arxiv-fetch" / "config.json",  # user-global; survives plugin updates
 ]
 NAMESPACES = {"dc": "http://purl.org/dc/elements/1.1/"}
 MAX_AUTHORS = 10

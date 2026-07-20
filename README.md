@@ -78,7 +78,7 @@ On days without arXiv announcements (weekends/holidays) it writes an empty diges
 
 `skills/arxiv-fetch/` packages the fetch capability as a standalone agent skill (e.g. for Claude Code): the agent runs a dependency-free fetch script (`scripts/fetch_arxiv.py`, stdlib only — no `uv sync`, no API keys, no repo clone needed) and judges relevance itself, so users can ask for an on-demand digest on any topic.
 
-On first use the skill offers to save your default subjects and topics to `~/.config/arxiv-fetch/config.json` (or a `config.json` inside the skill folder); explicit subjects/topics in a request always override the config.
+On first use the skill walks you through saving your default subjects and topics — user-global (`~/.config/arxiv-fetch/config.json`), per-project (`.arxiv-fetch/config.json`), or inside the skill folder. Explicit subjects/topics in a request always override the config, and you can ask the agent to show, edit, or move your config at any time.
 
 ## Install as a skill (copy, no clone)
 

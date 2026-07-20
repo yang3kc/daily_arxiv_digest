@@ -17,21 +17,20 @@ Two inputs, resolved independently, same precedence:
 1. **From the request.** Explicit subjects ("check cs.SI") or topics ("papers
    about LLM persuasion") in the user's message always win. Free-form topic
    phrasing is fine — you are the judge; no schema. If the user names a topic
-   but no subject, infer likely subjects from [reference.md](reference.md).
+   but no subject, infer likely subjects from
+   [references/arxiv-categories.md](references/arxiv-categories.md).
 2. **From config.** A JSON file with `arxiv_subjects` (feed codes) and
-   `topics` (natural-language interests). Searched in order:
-   1. `config.json` in this skill directory (install-local)
-   2. `~/.config/arxiv-fetch/config.json` (user-global; survives skill
-      updates and reinstalls — respects `$XDG_CONFIG_HOME`)
-   The fetch script walks the same chain automatically for subjects; read
-   the same file for topics.
-3. **Neither available?** Ask the user for their subjects and topics, then
-   offer to save them so they don't have to repeat next time. Default to
-   the user-global path (`~/.config/arxiv-fetch/config.json`, safe under
-   every install method); see [config.example.json](config.example.json)
-   for the shape. Only offer the skill-directory location if the user
-   prefers install-local config and manages this skill's files themselves
-   (it would be lost on plugin updates).
+   `topics` (natural-language interests). Searched in order — project
+   (`.arxiv-fetch/config.json` in the working directory), install
+   (`config.json` in this skill directory), then user-global
+   (`~/.config/arxiv-fetch/config.json`). Full details:
+   [references/config/schema.md](references/config/schema.md). The fetch
+   script walks the same chain automatically for subjects; read the same
+   file for topics.
+3. **Neither available?** Run the first-time setup flow:
+   [references/config/first-time-setup.md](references/config/first-time-setup.md).
+   It is blocking when the request doesn't say what to fetch; otherwise
+   proceed and offer to save afterwards.
 
 ## Step 2 — Fetch
 
@@ -79,3 +78,24 @@ Only if the user asks to save the digest, write it where they specify
 working directory). For machine consumers, mirror the fetch JSON shape:
 keep each selected paper's fields and add `tldr` plus
 `matched_topics[] {topic, reason}`, with papers grouped or tagged by topic.
+
+## Changing your config
+
+Handle these directly when asked — the user should never need to hand-edit:
+
+- **"Show my arxiv config"** — print the active config file's path and
+  contents (walk the chain in [references/config/schema.md](references/config/schema.md);
+  say which file won and which others exist).
+- **"Change my subjects/topics"** — edit the active config file in place;
+  confirm the new values. Map informal names to codes via
+  [references/arxiv-categories.md](references/arxiv-categories.md).
+- **"Use different topics for this project"** — create
+  `.arxiv-fetch/config.json` in the project (it outranks user-global);
+  suggest gitignoring it if personal.
+- **"Move my config"** / scope change — copy the file to the new location,
+  delete the old one, confirm both paths.
+- **"Reset / start over"** — delete the config(s) they name, then re-run
+  [references/config/first-time-setup.md](references/config/first-time-setup.md).
+
+One-off requests ("just check cs.CY today") are overrides — never write
+them into the config unless asked to make them the default.
