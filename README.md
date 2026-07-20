@@ -104,7 +104,30 @@ Defaults live in a small `config.json` (`arxiv_subjects` + `topics`), searched i
 
 Explicit subjects/topics in a request always override the config without modifying it. You never need to hand-edit the file: ask the agent to *show*, *change*, *move*, or *reset* your arxiv config, or to set up project-specific topics ("use different topics for this project"). Details: [schema](skills/arxiv-fetch/references/config/schema.md), [first-time setup](skills/arxiv-fetch/references/config/first-time-setup.md).
 
-## Install as a skill (copy, no clone)
+## Installation
+
+The skill lives in `skills/arxiv-fetch/` and follows the portable `SKILL.md`
+convention, so any agent that reads markdown instruction files can use it.
+Compatible with Claude Code, Cursor, Windsurf, GitHub Copilot, and others.
+Pick whichever install approach fits your agent.
+
+### Claude Code plugin (recommended)
+
+Add this repo as a plugin marketplace, then install the `arxiv-fetch` plugin —
+this registers the skill and keeps it updatable:
+
+```
+/plugin marketplace add yang3kc/daily_arxiv_digest
+/plugin install arxiv-fetch@daily-arxiv-digest
+```
+
+With this route, keep your config in the user-global location
+(`~/.config/arxiv-fetch/config.json`) — it survives plugin updates, unlike a
+config inside the skill folder (see the precedence above).
+
+### Copy without cloning
+
+Extract just the skill folder from the repo tarball:
 
 ```sh
 mkdir -p ~/.claude/skills
@@ -112,18 +135,32 @@ curl -L https://github.com/yang3kc/daily_arxiv_digest/archive/refs/heads/main.ta
   | tar -xz --strip-components=2 -C ~/.claude/skills daily_arxiv_digest-main/skills/arxiv-fetch
 ```
 
-(Or copy/symlink `skills/arxiv-fetch/` from a clone into `~/.claude/skills/` or a project's `.claude/skills/`.)
+### Clone into your agent's skills directory
 
-## Install as a plugin (Claude Code)
+Clone the repo, then point your agent at the skill folder:
 
-This repo doubles as a plugin marketplace:
+```bash
+# Claude Code — clone, then symlink the skill into ~/.claude/skills/
+git clone git@github.com:yang3kc/daily_arxiv_digest.git ~/src/daily_arxiv_digest
+ln -s ~/src/daily_arxiv_digest/skills/arxiv-fetch ~/.claude/skills/arxiv-fetch
 
+# Cursor — link into your project (or global) rules/skills directory
+ln -s ~/src/daily_arxiv_digest/skills/arxiv-fetch .cursor/skills/arxiv-fetch
+
+# Any agent — clone anywhere, then point it at skills/arxiv-fetch/SKILL.md
+git clone git@github.com:yang3kc/daily_arxiv_digest.git /path/to/daily_arxiv_digest
 ```
-/plugin marketplace add yang3kc/daily_arxiv_digest
-/plugin install arxiv-fetch@daily-arxiv-digest
+
+### `skills` CLI
+
+For agents that support the [`vercel-labs/skills`](https://github.com/vercel-labs/skills) CLI:
+
+```bash
+npx skills install https://github.com/yang3kc/daily_arxiv_digest
 ```
 
-The plugin route gets you updates automatically. Keep your config in the user-global location (`~/.config/arxiv-fetch/config.json`) — it survives plugin updates, unlike a config inside the skill folder (see the precedence above).
+Once the skill is available to your agent, it activates automatically when your
+request matches its description.
 
 ## Relationship to the pipeline
 
