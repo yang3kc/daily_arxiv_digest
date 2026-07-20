@@ -74,7 +74,11 @@ With the API key in `.env`, the cron entry needs no environment setup of its own
 Repeated invocations on the same day are no-ops, so overlapping schedules or manual re-runs are safe.
 On days without arXiv announcements (weekends/holidays) it writes an empty digest so consumers can tell the run happened.
 
-## Dev
+## Agent skill
+
+`skills/arxiv-fetch/` packages the fetch capability as an agent skill (e.g. for Claude Code): the agent runs a dependency-free fetch script (`scripts/fetch_arxiv.py`, stdlib only — no `uv sync`, no API keys) and judges relevance itself, so users can ask for an on-demand digest on any topic. Subjects and topics default to the same `config.json` used by the cron pipeline, with per-request overrides. Install by copying or symlinking `skills/arxiv-fetch/` into your agent's skills directory (e.g. `~/.claude/skills/`).
+
+# Dev
 
 Run a quick integration check (fetches one feed and scores one paper):
 
