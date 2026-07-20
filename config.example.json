@@ -1,0 +1,19 @@
+{
+    "arxiv_rss_base_url": "http://arxiv.org/rss/",
+    "arxiv_subjects": [
+        "cs.CL",
+        "cs.LG"
+    ],
+    "topics": [
+        "Large language model evaluation and benchmarking",
+        "Retrieval-augmented generation and question answering",
+        "AI safety and alignment",
+        "Applications of machine learning in healthcare"
+    ],
+    "llm_provider": "openai",
+    "llm_model": "gpt-5-mini",
+    "number_of_concurrent_tasks": 20,
+    "timeout_seconds": 40,
+    "relevance_threshold": 0.8,
+    "output_dir": "digests"
+}

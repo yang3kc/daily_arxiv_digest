@@ -6,6 +6,10 @@ __pycache__/
 # Ignore data files
 *.json
 *.json.gz
+!config.example.json
+
+# Generated digests
+digests/
 
 # C extensions
 *.so
