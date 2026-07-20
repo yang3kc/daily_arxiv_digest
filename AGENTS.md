@@ -63,8 +63,27 @@ Papers are sorted by max relevance, descending, in both files. On days with no a
 
 - `skills/arxiv-fetch/` is a **standalone** agent skill (SKILL.md + stdlib-only `scripts/fetch_arxiv.py` + reference.md + config.example.json): the agent fetches via the script and judges relevance itself. It must keep working when copied out of the repo — never make it import from `src/` or depend on repo-root paths.
 - Skill config search chain: `--subjects` flag → `--config` path → `.arxiv-fetch/config.json` in the working directory (project) → `config.json` in the skill dir (install) → `~/.config/arxiv-fetch/config.json` (user-global, XDG). The repo-root `config.json` is NOT on the chain; inside the repo, pass it via `--config` if wanted. Config UX (first-time setup, schema, managing edits) is documented in `skills/arxiv-fetch/references/config/`.
-- `.claude-plugin/` holds the plugin + marketplace manifests (this repo doubles as a Claude Code plugin marketplace; install via `/plugin marketplace add yang3kc/daily_arxiv_digest`). Bump `version` in `.claude-plugin/plugin.json` when the skill changes.
+- `.claude-plugin/` holds the plugin + marketplace manifests (this repo doubles as a Claude Code plugin marketplace; install via `/plugin marketplace add yang3kc/daily_arxiv_digest`). See "Versioning & releases" below for the release procedure.
 - `.gitignore` ignores `*.json` globally with explicit exceptions (`config.example.json`, the two `.claude-plugin/` manifests) — when adding a new tracked JSON file, add an exception.
+
+## Versioning & releases
+
+The plugin version is pinned in **`.claude-plugin/plugin.json` only** (single
+source of truth; a `version` in the marketplace entry would be silently
+overridden by it). Because the version is pinned, **updates are version-gated**:
+pushing new commits to `main` without bumping delivers no update to existing
+plugin users — Claude Code sees the same version and keeps its cache.
+
+Cutting a release (all on `main`, after the feature branch has merged):
+
+1. Bump `version` in `.claude-plugin/plugin.json` (semver: patch for fixes,
+   minor for new skill capabilities, major for breaking config/output changes).
+2. Tag the commit that contains that version and cut a matching GitHub release:
+   `git tag vX.Y.Z && git push origin vX.Y.Z`, then
+   `gh release create vX.Y.Z --title "vX.Y.Z" --notes "..."` — the tag and the
+   manifest version must agree.
+3. Version bumps cover the **skill/plugin**; changes to the digest pipeline
+   (`main.py`, `src/`) don't require a bump unless they touch the skill.
 
 ## Development Notes
 
