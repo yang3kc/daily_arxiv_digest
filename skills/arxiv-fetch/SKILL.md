@@ -54,8 +54,16 @@ Output: `{fetched_at, subjects, stats, papers[]}`; each paper has `id`,
 Author names may contain raw TeX accents (`Ra\'ul`) — render them properly
 in any digest you write.
 
-Weekends/holidays have no announcements — an empty `papers[]` is a normal
-result, not an error; tell the user there were no new announcements.
+`--subjects` overrides only the subject list; `arxiv_rss_base_url` (if
+configured) is still honored. `--config` replaces the search chain
+entirely.
+
+**Check `stats.failed_subjects` before interpreting results.** Feeds are
+retried once; ones that still fail land there (exit code is nonzero if
+every feed failed, and nothing is written). An empty `papers[]` with no
+failed subjects is a normal weekend/holiday — tell the user there were no
+new announcements. If some feeds failed, say the results are partial and
+name the failed feeds — never report "no announcements" on a failure.
 
 ## Step 3 — Judge relevance
 

@@ -11,8 +11,10 @@ script walks the same chain for subjects):
 | 2 | `config.json` in the skill directory | Install | **No** for plugin installs; yes for copied/cloned installs |
 | 3 | `~/.config/arxiv-fetch/config.json` (`$XDG_CONFIG_HOME` respected) | User-global | Yes |
 
-Per-invocation `--subjects` / `--config` flags and explicit subjects/topics
-in the user's request override any file.
+Per-invocation overrides: `--subjects` (and explicit subjects/topics in the
+user's request) override the subject/topic lists only — `arxiv_rss_base_url`
+is still read from the config file when one exists. `--config <path>`
+replaces the search chain entirely (it is an error if the file is missing).
 
 ## Fields
 

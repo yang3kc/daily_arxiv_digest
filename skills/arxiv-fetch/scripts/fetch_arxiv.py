@@ -22,9 +22,17 @@ Prints a JSON document to stdout (or --output file):
   ]
 }
 
-Subject resolution: --subjects flag wins; then --config; then the first
-existing config file on the search chain (skill directory, then
-~/.config/arxiv-fetch/ — see CONFIG_SEARCH_CHAIN).
+Subject resolution: --subjects flag wins; then the config file — either
+--config, or the first existing file on the search chain (project
+.arxiv-fetch/, then the skill directory, then ~/.config/arxiv-fetch/ —
+see CONFIG_SEARCH_CHAIN). `arxiv_rss_base_url` is always read from the
+config file when one is found, even when --subjects overrides the
+subject list.
+
+Failure semantics: feeds that fail (after one retry) are listed in
+stats.failed_subjects; the process exits nonzero if every feed failed,
+so an empty papers[] with exit 0 and no failed_subjects really means
+"no announcements" (weekend/holiday).
 """
 
 import argparse
@@ -34,6 +42,7 @@ import re
 import sys
 import urllib.request
 import xml.etree.ElementTree as ET
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 from html.parser import HTMLParser
 from pathlib import Path
@@ -114,7 +123,7 @@ def fetch_subject(subject, base_url):
     """Fetch one subject feed, return a list of paper dicts."""
     url = base_url.rstrip("/") + "/" + subject
     request = urllib.request.Request(url, headers={"User-Agent": "arxiv-fetch-skill"})
-    with urllib.request.urlopen(request, timeout=60) as response:
+    with urllib.request.urlopen(request, timeout=30) as response:
         root = ET.fromstring(response.read())
 
     papers = []
@@ -135,25 +144,75 @@ def fetch_subject(subject, base_url):
     return papers
 
 
-def resolve_subjects(args):
-    """--subjects flag > --config file > first config on the search chain."""
-    if args.subjects:
-        return [s.strip() for s in args.subjects.split(",") if s.strip()], DEFAULT_BASE_URL
+def load_config(args):
+    """Return (config dict, path) from --config or the search chain; ({}, None) if absent."""
+    if args.config:
+        config_path = Path(args.config)
+        if not config_path.is_file():
+            sys.exit(f"error: config file not found: {config_path}")
+        candidates = [config_path]
+    else:
+        candidates = CONFIG_SEARCH_CHAIN
 
-    candidates = [Path(args.config)] if args.config else CONFIG_SEARCH_CHAIN
     for config_path in candidates:
         if config_path.is_file():
-            config = json.loads(config_path.read_text())
-            subjects = config.get("arxiv_subjects", [])
-            base_url = config.get("arxiv_rss_base_url", DEFAULT_BASE_URL)
-            if subjects:
-                return subjects, base_url
+            try:
+                config = json.loads(config_path.read_text())
+            except json.JSONDecodeError as error:
+                sys.exit(f"error: invalid JSON in {config_path}: {error}")
+            if not isinstance(config, dict):
+                sys.exit(f"error: {config_path} must contain a JSON object.")
+            return config, config_path
+    return {}, None
 
-    searched = ", ".join(str(path) for path in candidates)
+
+def resolve_inputs(args):
+    """Return (subjects, base_url).
+
+    Subjects: --subjects flag > config 'arxiv_subjects'. The base URL is
+    read from the config file whenever one exists (even under --subjects),
+    falling back to DEFAULT_BASE_URL.
+    """
+    config, config_path = load_config(args)
+
+    base_url = config.get("arxiv_rss_base_url", DEFAULT_BASE_URL)
+    if not isinstance(base_url, str) or not base_url.strip():
+        sys.exit(f"error: 'arxiv_rss_base_url' in {config_path} must be a non-empty string.")
+
+    if args.subjects:
+        subjects = [s.strip() for s in args.subjects.split(",") if s.strip()]
+        if subjects:
+            return subjects, base_url
+
+    subjects = config.get("arxiv_subjects", [])
+    if not isinstance(subjects, list) or not all(
+        isinstance(s, str) and s.strip() for s in subjects
+    ):
+        sys.exit(
+            f"error: 'arxiv_subjects' in {config_path} must be a list of "
+            "non-empty strings (e.g. [\"cs.CL\", \"cs.LG\"])."
+        )
+    if subjects:
+        return [s.strip() for s in subjects], base_url
+
+    searched = ", ".join(str(path) for path in ([config_path] if config_path else CONFIG_SEARCH_CHAIN))
     sys.exit(
         "error: no subjects given. Pass --subjects cs.CL,cs.LG or provide a "
         f"config file with an 'arxiv_subjects' list (searched: {searched})."
     )
+
+
+def fetch_subject_with_retry(subject, base_url):
+    """Fetch a feed, retrying once on failure. Returns (papers, error)."""
+    for attempt in (1, 2):
+        try:
+            return fetch_subject(subject, base_url), None
+        except Exception as error:  # noqa: BLE001 — per-feed isolation; reported upstream
+            if attempt == 1:
+                print(f"warning: {subject} failed ({error}), retrying...", file=sys.stderr)
+            else:
+                return [], error
+    return [], None  # unreachable
 
 
 def main():
@@ -164,21 +223,34 @@ def main():
     parser.add_argument("--output", help="Write JSON here instead of stdout")
     args = parser.parse_args()
 
-    subjects, base_url = resolve_subjects(args)
+    subjects, base_url = resolve_inputs(args)
+
+    with ThreadPoolExecutor(max_workers=min(8, len(subjects))) as pool:
+        results = list(pool.map(lambda s: fetch_subject_with_retry(s, base_url), subjects))
 
     papers_by_id = {}
     by_subject = {}
-    for subject in subjects:
-        try:
-            papers = fetch_subject(subject, base_url)
-        except Exception as error:  # noqa: BLE001 — report per-feed failure, keep going
+    failed_subjects = []
+    for subject, (papers, error) in zip(subjects, results):
+        if error is not None:
             print(f"warning: failed to fetch {subject}: {error}", file=sys.stderr)
+            failed_subjects.append(subject)
             by_subject[subject] = 0
             continue
         by_subject[subject] = len(papers)
         for paper in papers:
-            existing = papers_by_id.setdefault(paper["id"], {**paper, "subjects": []})
-            existing["subjects"].append(subject)
+            existing = papers_by_id.get(paper["id"])
+            if existing is None:
+                papers_by_id[paper["id"]] = {**paper, "subjects": [subject]}
+            else:
+                existing["subjects"].append(subject)
+                # A paper can be "new" in its primary feed but "cross" in
+                # others — keep "new" regardless of which feed came first.
+                if paper["announce_type"] == "new":
+                    existing["announce_type"] = "new"
+
+    if failed_subjects and len(failed_subjects) == len(subjects):
+        sys.exit(f"error: all feeds failed ({', '.join(failed_subjects)}); no output written.")
 
     papers = list(papers_by_id.values())
     if args.new_only:
@@ -187,16 +259,29 @@ def main():
     result = {
         "fetched_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "subjects": subjects,
-        "stats": {"papers_fetched": len(papers), "by_subject": by_subject},
+        "stats": {
+            "papers_fetched": len(papers),
+            "by_subject": by_subject,
+            "failed_subjects": failed_subjects,
+        },
         "papers": papers,
     }
 
     output = json.dumps(result, indent=2, ensure_ascii=False)
     if args.output:
-        Path(args.output).write_text(output + "\n")
+        output_path = Path(args.output)
+        if output_path.parent != Path("."):
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(output + "\n")
         print(f"wrote {len(papers)} papers to {args.output}", file=sys.stderr)
     else:
         print(output)
+    if failed_subjects:
+        print(
+            f"warning: {len(failed_subjects)} of {len(subjects)} feeds failed: "
+            f"{', '.join(failed_subjects)} — results are partial.",
+            file=sys.stderr,
+        )
 
 
 if __name__ == "__main__":

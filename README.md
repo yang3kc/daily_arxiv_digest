@@ -99,7 +99,7 @@ This repo doubles as a plugin marketplace:
 /plugin install arxiv-fetch@daily-arxiv-digest
 ```
 
-The plugin route gets you updates automatically; keep your config in `~/.config/arxiv-fetch/config.json` (the skill's default), which survives updates.
+The plugin route gets you updates automatically. Keep your config in the user-global location (`~/.config/arxiv-fetch/config.json`) — it survives plugin updates, unlike a config inside the skill folder. Note the precedence: a project-local `.arxiv-fetch/config.json` or a config inside the skill folder wins over the user-global file when present.
 
 # Dev
 
