@@ -59,6 +59,13 @@ Papers are sorted by max relevance, descending, in both files. On days with no a
 - `config.json` - arXiv subjects, research topics, `llm_provider` + `llm_model`, concurrency, `relevance_threshold`, `output_dir`; gitignored — copy from the tracked `config.example.json`
 - `pyproject.toml` - Project dependencies and metadata
 
+## Agent Skill Packaging
+
+- `skills/arxiv-fetch/` is a **standalone** agent skill (SKILL.md + stdlib-only `scripts/fetch_arxiv.py` + reference.md + config.example.json): the agent fetches via the script and judges relevance itself. It must keep working when copied out of the repo — never make it import from `src/` or depend on repo-root paths.
+- Skill config search chain: `--subjects` flag → `--config` path → `config.json` in the skill dir → `~/.config/arxiv-fetch/config.json` (XDG). The repo-root `config.json` is NOT on the chain; inside the repo, pass it via `--config` if wanted.
+- `.claude-plugin/` holds the plugin + marketplace manifests (this repo doubles as a Claude Code plugin marketplace; install via `/plugin marketplace add yang3kc/daily_arxiv_digest`). Bump `version` in `.claude-plugin/plugin.json` when the skill changes.
+- `.gitignore` ignores `*.json` globally with explicit exceptions (`config.example.json`, the two `.claude-plugin/` manifests) — when adding a new tracked JSON file, add an exception.
+
 ## Development Notes
 
 - The Streamlit UI was removed in the headless revamp; `digest.md` is the human-readable surface

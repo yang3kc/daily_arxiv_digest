@@ -22,12 +22,14 @@ Prints a JSON document to stdout (or --output file):
   ]
 }
 
-Subject resolution: --subjects flag wins; otherwise arxiv_subjects from
---config (or the repo-root config.json next to this skill, if present).
+Subject resolution: --subjects flag wins; then --config; then the first
+existing config file on the search chain (skill directory, then
+~/.config/arxiv-fetch/ — see CONFIG_SEARCH_CHAIN).
 """
 
 import argparse
 import json
+import os
 import re
 import sys
 import urllib.request
@@ -37,7 +39,12 @@ from html.parser import HTMLParser
 from pathlib import Path
 
 DEFAULT_BASE_URL = "https://rss.arxiv.org/rss/"
-REPO_ROOT_CONFIG = Path(__file__).resolve().parents[3] / "config.json"
+SKILL_DIR = Path(__file__).resolve().parents[1]
+XDG_CONFIG_HOME = Path(os.environ.get("XDG_CONFIG_HOME", "~/.config")).expanduser()
+CONFIG_SEARCH_CHAIN = [
+    SKILL_DIR / "config.json",  # install-local (copy/clone installs)
+    XDG_CONFIG_HOME / "arxiv-fetch" / "config.json",  # universal; survives plugin updates
+]
 NAMESPACES = {"dc": "http://purl.org/dc/elements/1.1/"}
 MAX_AUTHORS = 10
 
@@ -128,21 +135,23 @@ def fetch_subject(subject, base_url):
 
 
 def resolve_subjects(args):
-    """--subjects flag > --config file > repo-root config.json."""
+    """--subjects flag > --config file > first config on the search chain."""
     if args.subjects:
         return [s.strip() for s in args.subjects.split(",") if s.strip()], DEFAULT_BASE_URL
 
-    config_path = Path(args.config) if args.config else REPO_ROOT_CONFIG
-    if config_path.is_file():
-        config = json.loads(config_path.read_text())
-        subjects = config.get("arxiv_subjects", [])
-        base_url = config.get("arxiv_rss_base_url", DEFAULT_BASE_URL)
-        if subjects:
-            return subjects, base_url
+    candidates = [Path(args.config)] if args.config else CONFIG_SEARCH_CHAIN
+    for config_path in candidates:
+        if config_path.is_file():
+            config = json.loads(config_path.read_text())
+            subjects = config.get("arxiv_subjects", [])
+            base_url = config.get("arxiv_rss_base_url", DEFAULT_BASE_URL)
+            if subjects:
+                return subjects, base_url
 
+    searched = ", ".join(str(path) for path in candidates)
     sys.exit(
         "error: no subjects given. Pass --subjects cs.CL,cs.LG or provide a "
-        f"config file with an 'arxiv_subjects' list (looked for {config_path})."
+        f"config file with an 'arxiv_subjects' list (searched: {searched})."
     )
 
 

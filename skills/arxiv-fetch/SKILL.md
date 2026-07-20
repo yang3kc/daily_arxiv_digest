@@ -7,7 +7,8 @@ description: Fetch the latest arXiv papers and generate an on-demand digest. Use
 
 Fetch the latest papers from arXiv RSS feeds, judge their relevance to the
 user's topics **yourself** (you are the LLM — no external API calls), and
-present a digest.
+present a digest. Fully standalone: the fetch script is Python-stdlib-only,
+needs no API keys, and no other files beyond this skill directory.
 
 ## Step 1 — Resolve subjects and topics
 
@@ -17,11 +18,20 @@ Two inputs, resolved independently, same precedence:
    about LLM persuasion") in the user's message always win. Free-form topic
    phrasing is fine — you are the judge; no schema. If the user names a topic
    but no subject, infer likely subjects from [reference.md](reference.md).
-2. **From config.** `config.json` at the repo root (fields: `arxiv_subjects`,
-   `topics`) — the same file the cron pipeline uses. The fetch script reads
-   `arxiv_subjects` from it automatically when `--subjects` is not passed.
-3. **Neither available?** Ask the user, and offer to create `config.json`
-   from `config.example.json` so they don't have to specify next time.
+2. **From config.** A JSON file with `arxiv_subjects` (feed codes) and
+   `topics` (natural-language interests). Searched in order:
+   1. `config.json` in this skill directory (install-local)
+   2. `~/.config/arxiv-fetch/config.json` (user-global; survives skill
+      updates and reinstalls — respects `$XDG_CONFIG_HOME`)
+   The fetch script walks the same chain automatically for subjects; read
+   the same file for topics.
+3. **Neither available?** Ask the user for their subjects and topics, then
+   offer to save them so they don't have to repeat next time. Default to
+   the user-global path (`~/.config/arxiv-fetch/config.json`, safe under
+   every install method); see [config.example.json](config.example.json)
+   for the shape. Only offer the skill-directory location if the user
+   prefers install-local config and manages this skill's files themselves
+   (it would be lost on plugin updates).
 
 ## Step 2 — Fetch
 
@@ -29,10 +39,11 @@ Two inputs, resolved independently, same precedence:
 python3 scripts/fetch_arxiv.py --subjects cs.SI,cs.CY --output <scratchpad>/arxiv.json
 ```
 
-Stdlib-only (any Python 3), no keys. Flags:
+(Any Python 3; run from this skill directory, or call the script by its
+absolute path.) Flags:
 
 - `--subjects a,b,c` — override config subjects
-- `--config <path>` — alternate config file
+- `--config <path>` — explicit config file, skipping the search chain
 - `--new-only` — drop cross-lists (`cross`) and revisions (`replace`); use
   this by default unless the user wants everything
 - `--output <path>` — write to a file instead of stdout (prefer this; write
@@ -63,7 +74,8 @@ Present in chat, grouped by topic: title (linked to `url`), authors, and a
 one-to-two-sentence TL;DR in your own words focused on what's relevant to
 the topic. Note total fetched vs. selected so the user knows the coverage.
 
-Only if the user asks to save it, write to `digests/<date>-adhoc-<slug>/`
-in this repo (gitignored), mirroring the cron pipeline's `digest.md` +
-`digest.json` contract (see AGENTS.md "Output Contract") so downstream
-consumers can treat both alike.
+Only if the user asks to save the digest, write it where they specify
+(default suggestion: `arxiv-digest-YYYY-MM-DD-<slug>.md` in the current
+working directory). For machine consumers, mirror the fetch JSON shape:
+keep each selected paper's fields and add `tldr` plus
+`matched_topics[] {topic, reason}`, with papers grouped or tagged by topic.

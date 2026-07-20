@@ -1,0 +1,15 @@
+{
+    "name": "daily-arxiv-digest",
+    "description": "Agent skills from the daily_arxiv_digest project: fetch the latest arXiv papers and generate on-demand digests.",
+    "owner": {
+        "name": "Kaicheng Yang",
+        "url": "https://github.com/yang3kc"
+    },
+    "plugins": [
+        {
+            "name": "arxiv-fetch",
+            "source": "./",
+            "description": "Fetch the latest arXiv papers and generate an on-demand digest. The agent judges relevance itself — no API keys needed."
+        }
+    ]
+}

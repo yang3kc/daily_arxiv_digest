@@ -7,6 +7,8 @@ __pycache__/
 *.json
 *.json.gz
 !config.example.json
+!.claude-plugin/plugin.json
+!.claude-plugin/marketplace.json
 
 # Generated digests
 digests/

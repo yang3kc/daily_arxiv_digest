@@ -1,0 +1,18 @@
+{
+    "name": "arxiv-fetch",
+    "description": "Fetch the latest arXiv papers and generate an on-demand digest. The agent judges relevance itself — no API keys needed.",
+    "version": "0.1.0",
+    "author": {
+        "name": "Kaicheng Yang",
+        "url": "https://github.com/yang3kc"
+    },
+    "homepage": "https://github.com/yang3kc/daily_arxiv_digest",
+    "repository": "https://github.com/yang3kc/daily_arxiv_digest",
+    "license": "MIT",
+    "keywords": [
+        "arxiv",
+        "papers",
+        "research",
+        "digest"
+    ]
+}

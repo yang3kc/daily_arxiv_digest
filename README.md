@@ -76,7 +76,30 @@ On days without arXiv announcements (weekends/holidays) it writes an empty diges
 
 ## Agent skill
 
-`skills/arxiv-fetch/` packages the fetch capability as an agent skill (e.g. for Claude Code): the agent runs a dependency-free fetch script (`scripts/fetch_arxiv.py`, stdlib only — no `uv sync`, no API keys) and judges relevance itself, so users can ask for an on-demand digest on any topic. Subjects and topics default to the same `config.json` used by the cron pipeline, with per-request overrides. Install by copying or symlinking `skills/arxiv-fetch/` into your agent's skills directory (e.g. `~/.claude/skills/`).
+`skills/arxiv-fetch/` packages the fetch capability as a standalone agent skill (e.g. for Claude Code): the agent runs a dependency-free fetch script (`scripts/fetch_arxiv.py`, stdlib only — no `uv sync`, no API keys, no repo clone needed) and judges relevance itself, so users can ask for an on-demand digest on any topic.
+
+On first use the skill offers to save your default subjects and topics to `~/.config/arxiv-fetch/config.json` (or a `config.json` inside the skill folder); explicit subjects/topics in a request always override the config.
+
+## Install as a skill (copy, no clone)
+
+```sh
+mkdir -p ~/.claude/skills
+curl -L https://github.com/yang3kc/daily_arxiv_digest/archive/refs/heads/main.tar.gz \
+  | tar -xz --strip-components=2 -C ~/.claude/skills daily_arxiv_digest-main/skills/arxiv-fetch
+```
+
+(Or copy/symlink `skills/arxiv-fetch/` from a clone into `~/.claude/skills/` or a project's `.claude/skills/`.)
+
+## Install as a plugin (Claude Code)
+
+This repo doubles as a plugin marketplace:
+
+```
+/plugin marketplace add yang3kc/daily_arxiv_digest
+/plugin install arxiv-fetch@daily-arxiv-digest
+```
+
+The plugin route gets you updates automatically; keep your config in `~/.config/arxiv-fetch/config.json` (the skill's default), which survives updates.
 
 # Dev
 
