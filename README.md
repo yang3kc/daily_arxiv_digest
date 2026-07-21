@@ -8,7 +8,7 @@ This tool fetches the latest arXiv papers, uses an LLM to rate their relevance t
 It comes in two forms:
 
 - **Daily digest pipeline** (this section and below) — the full pipeline with its own LLM calls, designed to run unattended (e.g. daily cron). Needs an API key.
-- **[Agent skill](#agent-skill)** — a standalone skill for AI agents (e.g. Claude Code): the agent fetches the papers and judges relevance itself. No API key, no dependencies, no repo clone needed.
+- **[Agent skill](#agent-skill)** — a standalone skill for AI agents (e.g. Claude Code): the agent fetches the papers and judges relevance itself. No API key, no dependencies, no repo clone needed — just any Python 3.
 
 # How to use
 
