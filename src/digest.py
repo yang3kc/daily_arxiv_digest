@@ -224,42 +224,58 @@ def render_markdown(digest):
     return "\n".join(lines)
 
 
-def write_outputs(digest, scores, output_dir):
+def output_paths(output_dir, date_str):
+    """Date-stamped paths for the four per-date output files.
+
+    The output folder already carries the date, but stamping the filenames too
+    keeps each file self-identifying when copied out of its folder.
+    """
+    output_dir = Path(output_dir)
+    return {
+        "json": output_dir / f"digest-{date_str}.json",
+        "md": output_dir / f"digest-{date_str}.md",
+        "scores": output_dir / f"scores-{date_str}.json",
+        "tldrs": output_dir / f"tldrs-{date_str}.json",
+    }
+
+
+def write_outputs(digest, scores, output_dir, date_str):
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
-    json_path = output_dir / "digest.json"
-    md_path = output_dir / "digest.md"
-    scores_path = output_dir / "scores.json"
+    paths = output_paths(output_dir, date_str)
+    json_path = paths["json"]
+    md_path = paths["md"]
     with open(json_path, "w") as f:
         json.dump(digest, f, indent=2, ensure_ascii=False)
-    with open(scores_path, "w") as f:
+    with open(paths["scores"], "w") as f:
         json.dump(scores, f, indent=2, ensure_ascii=False)
     md_path.write_text(render_markdown(digest))
     return json_path, md_path
 
 
-def _load_tldr_cache(output_dir):
-    cache_path = Path(output_dir) / "tldrs.json"
+def _load_tldr_cache(output_dir, date_str):
+    cache_path = output_paths(output_dir, date_str)["tldrs"]
     if cache_path.exists():
         with open(cache_path) as f:
             return json.load(f)
     return {}
 
 
-def _save_tldr_cache(output_dir, tldrs):
-    cache_path = Path(output_dir) / "tldrs.json"
+def _save_tldr_cache(output_dir, date_str, tldrs):
+    cache_path = output_paths(output_dir, date_str)["tldrs"]
     with open(cache_path, "w") as f:
         json.dump(tldrs, f, indent=2, ensure_ascii=False)
 
 
 def rethreshold_digest(config, date_str, output_dir, threshold):
-    """Rebuild digest.json/digest.md from a saved scores.json at a new threshold.
+    """Rebuild the dated digest.json/digest.md from saved scores at a new threshold.
 
     Skips fetching and scoring entirely; TL;DRs are reused from the existing
-    digest.json and only generated for papers newly above the threshold.
+    digest-<date>.json and only generated for papers newly above the threshold.
     """
     output_dir = Path(output_dir)
-    scores_path = output_dir / "scores.json"
+    paths = output_paths(output_dir, date_str)
+    scores_path = paths["scores"]
     if not scores_path.exists():
         raise FileNotFoundError(
             f"{scores_path} not found; run the full pipeline for this date first."
@@ -267,8 +283,8 @@ def rethreshold_digest(config, date_str, output_dir, threshold):
     with open(scores_path) as f:
         scores = json.load(f)
 
-    old_tldrs = _load_tldr_cache(output_dir)
-    json_path = output_dir / "digest.json"
+    old_tldrs = _load_tldr_cache(output_dir, date_str)
+    json_path = paths["json"]
     if json_path.exists():
         with open(json_path) as f:
             for paper in json.load(f)["papers"]:
@@ -312,7 +328,7 @@ def rethreshold_digest(config, date_str, output_dir, threshold):
             if not paper["tldr"]:
                 paper["tldr"] = tldr_map.get(paper["id"], "")
         old_tldrs.update({k: v for k, v in tldr_map.items() if v})
-    _save_tldr_cache(output_dir, old_tldrs)
+    _save_tldr_cache(output_dir, date_str, old_tldrs)
 
     digest = {
         "date": scores["date"],
@@ -330,7 +346,7 @@ def rethreshold_digest(config, date_str, output_dir, threshold):
     }
     with open(json_path, "w") as f:
         json.dump(digest, f, indent=2, ensure_ascii=False)
-    md_path = output_dir / "digest.md"
+    md_path = paths["md"]
     md_path.write_text(render_markdown(digest))
     logger.log_activity(
         "rethreshold", "completed", {"threshold": threshold, "selected": len(selected)}
@@ -339,7 +355,7 @@ def rethreshold_digest(config, date_str, output_dir, threshold):
 
 
 def run_digest(config, date_str, output_dir):
-    """Run the full pipeline and write digest.json + digest.md to output_dir."""
+    """Run the full pipeline and write the dated digest.json + digest.md to output_dir."""
     paper_df = fetch_papers(config)
 
     if paper_df.empty:
@@ -347,7 +363,7 @@ def run_digest(config, date_str, output_dir):
         # so downstream consumers can tell the run happened.
         digest = build_digest(date_str, paper_df, pd.DataFrame(), {}, config)
         scores = build_scores(date_str, pd.DataFrame(), config)
-        json_path, md_path = write_outputs(digest, scores, output_dir)
+        json_path, md_path = write_outputs(digest, scores, output_dir, date_str)
         logger.log_activity("complete_run", "completed", {"papers_selected": 0})
         return digest, json_path, md_path
 
@@ -362,10 +378,10 @@ def run_digest(config, date_str, output_dir):
     tldrs = add_tldrs(llm_reader, paper_df, selected_df, config)
     digest = build_digest(date_str, paper_df, selected_df, tldrs, config)
     scores = build_scores(date_str, scored_df, config)
-    json_path, md_path = write_outputs(digest, scores, output_dir)
-    cache = _load_tldr_cache(output_dir)
+    json_path, md_path = write_outputs(digest, scores, output_dir, date_str)
+    cache = _load_tldr_cache(output_dir, date_str)
     cache.update({k: v for k, v in tldrs.items() if v})
-    _save_tldr_cache(output_dir, cache)
+    _save_tldr_cache(output_dir, date_str, cache)
     logger.log_activity(
         "complete_run",
         "completed",
