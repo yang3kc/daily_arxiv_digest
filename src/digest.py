@@ -179,6 +179,38 @@ def build_scores(date_str, scored_df, config):
     }
 
 
+def _short_topic(topic, limit=30):
+    """A compact label for a long topic sentence, truncated on a word boundary.
+
+    The result never exceeds ``limit`` characters (the appended ellipsis counts
+    toward the budget). Falls back to a hard cut when the prefix has no space.
+    """
+    if len(topic) <= limit:
+        return topic
+    prefix = topic[: limit - 1]
+    head, sep, _ = prefix.rpartition(" ")
+    return (head if sep else prefix) + "…"
+
+
+def _topic_labels(topics, limit=30):
+    """Map each topic to a short display label, keeping labels distinguishable.
+
+    Two topics that share a long prefix would shorten to the same string, making
+    the cross-topic note ambiguous. When that happens, every topic in the
+    colliding group falls back to its full text so the note still identifies
+    which other topic matched.
+    """
+    labels = {topic: _short_topic(topic, limit) for topic in topics}
+    collisions = {}
+    for topic, label in labels.items():
+        collisions.setdefault(label, []).append(topic)
+    for group in collisions.values():
+        if len(group) > 1:
+            for topic in group:
+                labels[topic] = topic
+    return labels
+
+
 def render_markdown(digest):
     """Render the digest record as a human-readable markdown document."""
     lines = [
@@ -196,6 +228,9 @@ def render_markdown(digest):
         lines.append("No papers passed the relevance threshold today.")
         lines.append("")
         return "\n".join(lines)
+
+    # Short, collision-safe labels for the cross-topic note below.
+    topic_labels = _topic_labels(digest["topics"])
 
     # Group papers by topic; a paper can appear under several topics.
     papers_by_topic = {}
@@ -221,6 +256,16 @@ def render_markdown(digest):
                 lines.append("")
             lines.append(f"**Relevance {match['relevance']:.2f}** — {match['reason']}")
             lines.append("")
+            others = [
+                t["topic"]
+                for t in paper["matched_topics"]
+                if t["topic"] != match["topic"]
+            ]
+            if others:
+                noun = "topic" if len(others) == 1 else "topics"
+                labels = ", ".join(topic_labels.get(t, _short_topic(t)) for t in others)
+                lines.append(f"*Also matches {len(others)} other {noun}: {labels}*")
+                lines.append("")
     return "\n".join(lines)
 
 
