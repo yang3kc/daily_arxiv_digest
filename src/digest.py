@@ -179,6 +179,13 @@ def build_scores(date_str, scored_df, config):
     }
 
 
+def _short_topic(topic, limit=30):
+    """A compact label for a long topic sentence, truncated on a word boundary."""
+    if len(topic) <= limit:
+        return topic
+    return topic[:limit].rsplit(" ", 1)[0] + "…"
+
+
 def render_markdown(digest):
     """Render the digest record as a human-readable markdown document."""
     lines = [
@@ -221,6 +228,16 @@ def render_markdown(digest):
                 lines.append("")
             lines.append(f"**Relevance {match['relevance']:.2f}** — {match['reason']}")
             lines.append("")
+            others = [
+                t["topic"]
+                for t in paper["matched_topics"]
+                if t["topic"] != match["topic"]
+            ]
+            if others:
+                noun = "topic" if len(others) == 1 else "topics"
+                labels = ", ".join(_short_topic(t) for t in others)
+                lines.append(f"*Also matches {len(others)} other {noun}: {labels}*")
+                lines.append("")
     return "\n".join(lines)
 
 
