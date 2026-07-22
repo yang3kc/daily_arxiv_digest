@@ -48,11 +48,11 @@ Generate today's digest with:
 uv run python main.py
 ```
 
-The digest is written to `digests/YYYY-MM-DD/`:
+The digest is written to `digests/YYYY-MM-DD/`, with the date stamped into every filename so the files stay self-identifying when copied out of their folder:
 
-- `digest.md` — human-readable digest, grouped by topic, with a TL;DR for each selected paper
-- `digest.json` — structured record (metadata, stats, and selected papers with scores and TL;DRs) for programmatic consumption
-- `scores.json` — raw relevance scores for every fetched paper against every topic, so you can re-filter at any threshold on the fly without re-scoring
+- `digest-YYYY-MM-DD.md` — human-readable digest, grouped by topic, with a TL;DR for each selected paper
+- `digest-YYYY-MM-DD.json` — structured record (metadata, stats, and selected papers with scores and TL;DRs) for programmatic consumption
+- `scores-YYYY-MM-DD.json` — raw relevance scores for every fetched paper against every topic, so you can re-filter at any threshold on the fly without re-scoring
 
 If the digest for the day already exists, the run exits cleanly without spending API calls; use `--force` to regenerate.
 Other flags: `--config <path>` to use another config file, `--date YYYY-MM-DD` to label the output folder (the arXiv feed always returns the latest announcement).
@@ -63,7 +63,7 @@ To re-render the digest at a different threshold without re-fetching or re-scori
 uv run python main.py --rethreshold 0.9
 ```
 
-This rebuilds `digest.md`/`digest.json` from the saved `scores.json`; TL;DRs are cached in `tldrs.json`, so changing the threshold back and forth costs no API calls once a paper's TL;DR has been generated.
+This rebuilds `digest-YYYY-MM-DD.md`/`digest-YYYY-MM-DD.json` from the saved `scores-YYYY-MM-DD.json`; TL;DRs are cached in `tldrs-YYYY-MM-DD.json`, so changing the threshold back and forth costs no API calls once a paper's TL;DR has been generated.
 
 The `digests/` folder is gitignored: digests are local artifacts meant to be read in place (by you or by an agent), not committed.
 

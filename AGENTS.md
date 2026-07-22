@@ -11,7 +11,7 @@ Daily arXiv Digest is a headless CLI tool that fetches papers from arXiv RSS fee
 ### Development and Running
 - `make run` or `make all` - Generate today's digest
 - `uv run python main.py` - Direct command (flags: `--config`, `--date`, `--force`)
-- `uv run python main.py --rethreshold X` - Rebuild digest.md/digest.json from saved scores.json at threshold X (no fetch/re-score; TL;DRs cached in tldrs.json)
+- `uv run python main.py --rethreshold X` - Rebuild digest-<date>.md/digest-<date>.json from saved scores-<date>.json at threshold X (no fetch/re-score; TL;DRs cached in tldrs-<date>.json)
 - `uv sync` - Install/update dependencies
 
 ### Testing
@@ -27,7 +27,7 @@ Daily arXiv Digest is a headless CLI tool that fetches papers from arXiv RSS fee
 - `src/logger.py` - JSONL activity logging to `logs/activity.jsonl`; inspect with `check_log.py`
 
 ### Key Design Patterns
-- **Idempotent runs**: Output is keyed by date; if `digests/<date>/digest.json` exists the run exits cleanly (exit 0) without API calls, unless `--force`
+- **Idempotent runs**: Output is keyed by date; if `digests/<date>/digest-<date>.json` exists the run exits cleanly (exit 0) without API calls, unless `--force`
 - **Multi-provider via one code path**: OpenAI, Anthropic, and OpenRouter are all accessed through the OpenAI SDK (base_url override + per-provider API key env var); structured output via `chat.completions.parse` with Pydantic models
 - **Concurrent Processing**: ThreadPoolExecutor (50 workers by default) for both scoring and TL;DR phases
 - **Error Resilience**: Retry logic with graceful fallbacks — failed scoring returns neutral (0.0) judgements, failed TL;DRs return empty strings, so a batch never aborts
@@ -38,13 +38,14 @@ Daily arXiv Digest is a headless CLI tool that fetches papers from arXiv RSS fee
 2. Concurrently score every paper against every topic
 3. Select judgements with relevance ≥ `relevance_threshold`
 4. Generate one TL;DR per selected paper (a paper can match several topics)
-5. Write `digest.json` (selected papers), `digest.md` (rendered digest grouped by topic), and `scores.json` (raw scores for every fetched paper, for re-filtering at any threshold without re-scoring)
+5. Write `digest-<date>.json` (selected papers), `digest-<date>.md` (rendered digest grouped by topic), and `scores-<date>.json` (raw scores for every fetched paper, for re-filtering at any threshold without re-scoring)
 
 ### Output Contract
-`digest.json` top-level: `date`, `generated_at`, `provider`, `model`, `relevance_threshold`, `arxiv_subjects`, `topics`, `stats {papers_fetched, papers_selected}`, `papers[]`.
+All four output files live in `digests/<date>/` and stamp the date into their filenames (`digest-<date>.{json,md}`, `scores-<date>.json`, `tldrs-<date>.json`) so they stay self-identifying when copied out; `src.digest.output_paths(output_dir, date_str)` is the single source of truth for these names.
+`digest-<date>.json` top-level: `date`, `generated_at`, `provider`, `model`, `relevance_threshold`, `arxiv_subjects`, `topics`, `stats {papers_fetched, papers_selected}`, `papers[]`.
 Each paper: `id`, `title`, `authors[]`, `url`, `abstract`, `tldr`, `matched_topics[] {topic, relevance, reason}` (only judgements ≥ threshold).
-`scores.json`: same metadata (no threshold/stats) with `papers[]` covering EVERY fetched paper; each has `judgements[] {topic, relevance, reason}` for ALL topics.
-`tldrs.json`: cache of `{paper_id: tldr}` accumulated across runs/rethresholds of the same date.
+`scores-<date>.json`: same metadata (no threshold/stats) with `papers[]` covering EVERY fetched paper; each has `judgements[] {topic, relevance, reason}` for ALL topics.
+`tldrs-<date>.json`: cache of `{paper_id: tldr}` accumulated across runs/rethresholds of the same date.
 Papers are sorted by max relevance, descending, in both files. On days with no arXiv announcements empty files are still written.
 
 ## Configuration

@@ -6,7 +6,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-from src.digest import rethreshold_digest, run_digest
+from src.digest import output_paths, rethreshold_digest, run_digest
 
 load_dotenv()
 
@@ -63,7 +63,8 @@ def main():
         print(f"Rewrote {json_path} and {md_path}")
         return 0
 
-    json_path = output_dir / "digest.json"
+    paths = output_paths(output_dir, args.date)
+    json_path = paths["json"]
     if json_path.exists() and not args.force:
         print(f"Digest for {args.date} already exists at {json_path}; use --force to regenerate.")
         return 0
@@ -73,7 +74,7 @@ def main():
     print(
         f"Selected {stats['papers_selected']} of {stats['papers_fetched']} papers."
     )
-    print(f"Wrote {json_path}, {md_path}, and {json_path.parent / 'scores.json'}")
+    print(f"Wrote {json_path}, {md_path}, and {paths['scores']}")
     return 0
 
 
