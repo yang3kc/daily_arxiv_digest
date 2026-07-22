@@ -5,9 +5,20 @@ Covers the cross-topic note behavior shared by run_digest and --rethreshold,
 plus the short-label helpers.
 """
 
+import json
+import tempfile
+from pathlib import Path
+
 import pandas as pd
 
-from src.digest import add_tldrs, _short_topic, _topic_labels, render_markdown
+from src.digest import (
+    add_tldrs,
+    _load_tldr_cache,
+    _short_topic,
+    _topic_labels,
+    output_paths,
+    render_markdown,
+)
 from src.llm import LLMPaperReader
 
 TOPIC_A = "Security and safety of AI and language models"
@@ -146,6 +157,39 @@ def test_format_topics_is_a_clean_bulleted_block():
     assert "[" not in block and "'" not in block  # not a Python list repr
     # A bare string is treated as a single topic.
     assert LLMPaperReader._format_topics("solo") == "- solo"
+
+
+def test_scoring_prompt_puts_static_prefix_before_paper():
+    # Guards the caching optimization: the static rubric + topics must precede
+    # the per-paper title/abstract, or the shared prefix stops being cacheable.
+    prompt = LLMPaperReader.user_message.format(
+        topics=LLMPaperReader._format_topics([TOPIC_A, TOPIC_B]),
+        title="THE_TITLE",
+        abstract="THE_ABSTRACT",
+    )
+    topics_at = prompt.index(TOPIC_A)
+    rubric_at = prompt.index("Be strict and discriminating")
+    title_at = prompt.index("THE_TITLE")
+    abstract_at = prompt.index("THE_ABSTRACT")
+    assert topics_at < title_at and rubric_at < title_at
+    assert title_at < abstract_at
+
+
+def test_load_tldr_cache_tolerates_malformed_files():
+    with tempfile.TemporaryDirectory() as d:
+        out = Path(d)
+        cache_path = output_paths(out, "2026-07-22")["tldrs"]
+        # Missing file -> empty.
+        assert _load_tldr_cache(out, "2026-07-22") == {}
+        # Invalid JSON -> empty, no crash.
+        cache_path.write_text("{not json")
+        assert _load_tldr_cache(out, "2026-07-22") == {}
+        # Wrong top-level type -> empty.
+        cache_path.write_text(json.dumps(["a", "b"]))
+        assert _load_tldr_cache(out, "2026-07-22") == {}
+        # Non-string values are dropped; valid string entries survive.
+        cache_path.write_text(json.dumps({"p1": "ok", "p2": 5, "p3": None}))
+        assert _load_tldr_cache(out, "2026-07-22") == {"p1": "ok"}
 
 
 if __name__ == "__main__":

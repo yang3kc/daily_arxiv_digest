@@ -309,11 +309,27 @@ def write_outputs(digest, scores, output_dir, date_str):
 
 
 def _load_tldr_cache(output_dir, date_str):
+    """Load the {paper_id: tldr} cache, tolerating a malformed file.
+
+    A corrupt or wrong-shaped cache must never abort a run (especially --force,
+    which should be able to repair its own outputs), so anything that is not a
+    dict of str->str is treated as empty and only valid string entries survive.
+    """
     cache_path = output_paths(output_dir, date_str)["tldrs"]
-    if cache_path.exists():
+    if not cache_path.exists():
+        return {}
+    try:
         with open(cache_path) as f:
-            return json.load(f)
-    return {}
+            data = json.load(f)
+    except (json.JSONDecodeError, OSError) as e:
+        print(f"Warning: ignoring unreadable TL;DR cache {cache_path}: {e}")
+        return {}
+    if not isinstance(data, dict):
+        print(f"Warning: ignoring malformed TL;DR cache {cache_path} (not an object)")
+        return {}
+    return {
+        k: v for k, v in data.items() if isinstance(k, str) and isinstance(v, str)
+    }
 
 
 def _save_tldr_cache(output_dir, date_str, tldrs):
