@@ -5,7 +5,10 @@ Covers the cross-topic note behavior shared by run_digest and --rethreshold,
 plus the short-label helpers.
 """
 
-from src.digest import _short_topic, _topic_labels, render_markdown
+import pandas as pd
+
+from src.digest import add_tldrs, _short_topic, _topic_labels, render_markdown
+from src.llm import LLMPaperReader
 
 TOPIC_A = "Security and safety of AI and language models"
 TOPIC_B = "Factuality of AI systems, misinformation, and fact-checking"
@@ -87,6 +90,62 @@ def test_empty_digest_renders_placeholder():
     md = render_markdown(_digest([], [TOPIC_A]))
     assert "No papers passed the relevance threshold today." in md
     assert "Also matches" not in md
+
+
+class _ExplodingReader:
+    """A TL;DR reader that fails the test if it is ever called."""
+
+    def write_tldr(self, paper, max_retries=3):
+        raise AssertionError("write_tldr should not run for a fully cached paper")
+
+
+def test_add_tldrs_reuses_cache_without_querying():
+    paper_df = pd.DataFrame(
+        [{"id": "p1", "title": "t", "abstract": "a", "url": "u", "authors": ["x"]}]
+    )
+    selected_df = pd.DataFrame([{"id": "p1", "topic": TOPIC_A, "relevance": 0.9}])
+    config = {"number_of_concurrent_tasks": 2}
+    # Every selected paper is cached, so no LLM call should happen.
+    result = add_tldrs(
+        _ExplodingReader(), paper_df, selected_df, config, cached={"p1": "cached tldr"}
+    )
+    assert result == {"p1": "cached tldr"}
+
+
+class _StubReader:
+    """A TL;DR reader that returns a deterministic generated summary."""
+
+    def write_tldr(self, paper, max_retries=3):
+        return {"id": paper["id"], "tldr": f"generated:{paper['id']}"}
+
+
+def test_add_tldrs_only_generates_missing_papers():
+    paper_df = pd.DataFrame(
+        [
+            {"id": "p1", "title": "t1", "abstract": "a1", "url": "u1", "authors": ["x"]},
+            {"id": "p2", "title": "t2", "abstract": "a2", "url": "u2", "authors": ["y"]},
+        ]
+    )
+    selected_df = pd.DataFrame(
+        [
+            {"id": "p1", "topic": TOPIC_A, "relevance": 0.9},
+            {"id": "p2", "topic": TOPIC_A, "relevance": 0.85},
+        ]
+    )
+    config = {"number_of_concurrent_tasks": 2}
+    # p1 is cached (reused); p2's cache entry is empty, so it must be regenerated.
+    result = add_tldrs(
+        _StubReader(), paper_df, selected_df, config, cached={"p1": "cached", "p2": ""}
+    )
+    assert result == {"p1": "cached", "p2": "generated:p2"}
+
+
+def test_format_topics_is_a_clean_bulleted_block():
+    block = LLMPaperReader._format_topics([TOPIC_A, TOPIC_B])
+    assert block == f"- {TOPIC_A}\n- {TOPIC_B}"
+    assert "[" not in block and "'" not in block  # not a Python list repr
+    # A bare string is treated as a single topic.
+    assert LLMPaperReader._format_topics("solo") == "- solo"
 
 
 if __name__ == "__main__":
