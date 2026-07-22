@@ -1,8 +1,11 @@
 import argparse
 import json
+import re
 import sys
 from datetime import date
 from pathlib import Path
+
+DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 from dotenv import load_dotenv
 
@@ -13,7 +16,7 @@ load_dotenv()
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Generate a daily arXiv digest (digest.md + digest.json)."
+        description="Generate a daily arXiv digest (digest-<date>.md + digest-<date>.json)."
     )
     parser.add_argument(
         "--config", default="config.json", help="Path to the config file"
@@ -33,11 +36,18 @@ def main():
         "--rethreshold",
         type=float,
         metavar="X",
-        help="Rebuild digest.md/digest.json from the saved scores.json at "
-        "threshold X — no fetching or re-scoring; TL;DRs are only generated "
-        "for papers newly above the threshold",
+        help="Rebuild digest-<date>.md/digest-<date>.json from the saved "
+        "scores-<date>.json at threshold X — no fetching or re-scoring; TL;DRs "
+        "are only generated for papers newly above the threshold",
     )
     args = parser.parse_args()
+
+    if not DATE_RE.match(args.date):
+        print(
+            f"Invalid --date '{args.date}'; expected YYYY-MM-DD "
+            "(it names the output folder and is stamped into the filenames)."
+        )
+        return 1
 
     if not Path(args.config).exists():
         print(

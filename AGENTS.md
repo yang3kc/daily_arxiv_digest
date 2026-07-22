@@ -88,5 +88,5 @@ Cutting a release (all on `main`, after the feature branch has merged):
 
 ## Development Notes
 
-- The Streamlit UI was removed in the headless revamp; `digest.md` is the human-readable surface
+- The Streamlit UI was removed in the headless revamp; `digest-<date>.md` is the human-readable surface
 - `digests/` is gitignored — outputs are local artifacts consumed in place by humans/agents

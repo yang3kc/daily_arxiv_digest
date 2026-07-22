@@ -268,10 +268,10 @@ def _save_tldr_cache(output_dir, date_str, tldrs):
 
 
 def rethreshold_digest(config, date_str, output_dir, threshold):
-    """Rebuild digest.json/digest.md from a saved scores.json at a new threshold.
+    """Rebuild the dated digest.json/digest.md from saved scores at a new threshold.
 
     Skips fetching and scoring entirely; TL;DRs are reused from the existing
-    digest.json and only generated for papers newly above the threshold.
+    digest-<date>.json and only generated for papers newly above the threshold.
     """
     output_dir = Path(output_dir)
     paths = output_paths(output_dir, date_str)
@@ -355,7 +355,7 @@ def rethreshold_digest(config, date_str, output_dir, threshold):
 
 
 def run_digest(config, date_str, output_dir):
-    """Run the full pipeline and write digest.json + digest.md to output_dir."""
+    """Run the full pipeline and write the dated digest.json + digest.md to output_dir."""
     paper_df = fetch_papers(config)
 
     if paper_df.empty:
