@@ -65,13 +65,11 @@ class LLMPaperReader:
         You are an assistant to help the user decide if a paper is very relevant to the topics of interests.
         """
 
+    # The static rubric + topics come first so the shared prefix is identical
+    # across every paper and providers can cache it; only the per-paper title
+    # and abstract vary, and they go last.
     user_message = """
-        Please read the following paper title and abstract:
-        --------------
-        Title: {title}
-        Abstract: {abstract}
-        --------------
-        Based on the title and abstract, please rate the direct relevance of the paper with the following topics:
+        Rate the direct relevance of a paper to each of the following topics:
         --------------
         {topics}
         --------------
@@ -83,6 +81,11 @@ class LLMPaperReader:
         If a topic description contains an exclusion (e.g. "NOT ..."), papers matching the exclusion must score 0.3 or lower on that topic.
         If the paper is relevant to the topic, provide a short explanation; otherwise, leave the explanation empty.
         Use your best guess when you are not sure.
+        Now read the paper's title and abstract and rate it:
+        --------------
+        Title: {title}
+        Abstract: {abstract}
+        --------------
     """
 
     tldr_system_message = """
@@ -103,10 +106,20 @@ class LLMPaperReader:
         self.client = create_client(provider, timeout_seconds)
         self.model = model
         self.topics = topics
+        # Render the topics into a clean bulleted block once, rather than
+        # stringifying the list (as a Python repr) on every scoring call. This
+        # block is part of the static, cacheable prompt prefix.
+        self.topics_block = self._format_topics(topics)
         # Some models (e.g. the GPT-5 family) only accept the default
         # temperature; drop the parameter permanently on the first rejection.
         self.use_temperature = True
         self.failure_count = 0
+
+    @staticmethod
+    def _format_topics(topics):
+        if isinstance(topics, str):
+            topics = [topics]
+        return "\n".join(f"- {topic}" for topic in topics)
 
     def _parse_completion(self, system_message, user_message, response_model):
         kwargs = {"temperature": 0.0} if self.use_temperature else {}
@@ -146,7 +159,7 @@ class LLMPaperReader:
                     self.user_message.format(
                         title=paper["title"],
                         abstract=paper["abstract"],
-                        topics=self.topics,
+                        topics=self.topics_block,
                     ),
                     Judgements,
                 )

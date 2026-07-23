@@ -79,12 +79,21 @@ def select_papers(scored_df, threshold):
     return scored_df[scored_df["relevance"] >= threshold]
 
 
-def add_tldrs(llm_reader, paper_df, selected_df, config):
-    """Generate one TL;DR per selected paper (papers can match several topics)."""
+def add_tldrs(llm_reader, paper_df, selected_df, config, cached=None):
+    """Generate one TL;DR per selected paper, reusing any cached TL;DRs.
+
+    A TL;DR depends only on a paper's title and abstract — not on the topics or
+    the relevance threshold — so any paper already present in ``cached`` is
+    reused instead of re-queried (papers can match several topics).
+    """
+    cached = cached or {}
     selected_ids = selected_df["id"].unique()
-    papers = paper_df[paper_df["id"].isin(selected_ids)].to_dict(orient="records")
+    result = {pid: cached[pid] for pid in selected_ids if cached.get(pid)}
+    papers = paper_df[
+        paper_df["id"].isin(selected_ids) & ~paper_df["id"].isin(list(result))
+    ].to_dict(orient="records")
     if not papers:
-        return {}
+        return result
     logger.log_activity("tldr_generation", "started")
     tldrs = _run_concurrently(
         llm_reader.write_tldr,
@@ -93,7 +102,8 @@ def add_tldrs(llm_reader, paper_df, selected_df, config):
         "Writing TL;DRs",
     )
     logger.log_activity("tldr_generation", "completed", {"tldr_count": len(tldrs)})
-    return {item["id"]: item["tldr"] for item in tldrs}
+    result.update({item["id"]: item["tldr"] for item in tldrs})
+    return result
 
 
 def build_digest(date_str, paper_df, selected_df, tldrs, config):
@@ -299,11 +309,27 @@ def write_outputs(digest, scores, output_dir, date_str):
 
 
 def _load_tldr_cache(output_dir, date_str):
+    """Load the {paper_id: tldr} cache, tolerating a malformed file.
+
+    A corrupt or wrong-shaped cache must never abort a run (especially --force,
+    which should be able to repair its own outputs), so anything that is not a
+    dict of str->str is treated as empty and only valid string entries survive.
+    """
     cache_path = output_paths(output_dir, date_str)["tldrs"]
-    if cache_path.exists():
+    if not cache_path.exists():
+        return {}
+    try:
         with open(cache_path) as f:
-            return json.load(f)
-    return {}
+            data = json.load(f)
+    except (json.JSONDecodeError, OSError) as e:
+        print(f"Warning: ignoring unreadable TL;DR cache {cache_path}: {e}")
+        return {}
+    if not isinstance(data, dict):
+        print(f"Warning: ignoring malformed TL;DR cache {cache_path} (not an object)")
+        return {}
+    return {
+        k: v for k, v in data.items() if isinstance(k, str) and isinstance(v, str)
+    }
 
 
 def _save_tldr_cache(output_dir, date_str, tldrs):
@@ -420,11 +446,13 @@ def run_digest(config, date_str, output_dir):
     )
     scored_df = score_papers(llm_reader, paper_df, config)
     selected_df = select_papers(scored_df, config["relevance_threshold"])
-    tldrs = add_tldrs(llm_reader, paper_df, selected_df, config)
+    # Reuse TL;DRs already computed for this date (e.g. on a --force re-run) so
+    # only papers without a cached summary are re-queried.
+    cache = _load_tldr_cache(output_dir, date_str)
+    tldrs = add_tldrs(llm_reader, paper_df, selected_df, config, cached=cache)
     digest = build_digest(date_str, paper_df, selected_df, tldrs, config)
     scores = build_scores(date_str, scored_df, config)
     json_path, md_path = write_outputs(digest, scores, output_dir, date_str)
-    cache = _load_tldr_cache(output_dir, date_str)
     cache.update({k: v for k, v in tldrs.items() if v})
     _save_tldr_cache(output_dir, date_str, cache)
     logger.log_activity(
