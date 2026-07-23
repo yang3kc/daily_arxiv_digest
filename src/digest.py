@@ -259,13 +259,8 @@ def render_markdown(digest):
         for match, paper in matches:
             lines.append(f"### [{paper['title']}]({paper['url']})")
             lines.append("")
-            lines.append(", ".join(paper["authors"]))
-            lines.append("")
-            if paper["tldr"]:
-                lines.append(f"**TL;DR:** {paper['tldr']}")
-                lines.append("")
-            lines.append(f"**Relevance {match['relevance']:.2f}** — {match['reason']}")
-            lines.append("")
+            # Cross-topic note first, right after the title, so a cross-listed
+            # paper is visible before the authors/TL;DR/relevance details.
             others = [
                 t["topic"]
                 for t in paper["matched_topics"]
@@ -276,6 +271,13 @@ def render_markdown(digest):
                 labels = ", ".join(topic_labels.get(t, _short_topic(t)) for t in others)
                 lines.append(f"*Also matches {len(others)} other {noun}: {labels}*")
                 lines.append("")
+            lines.append(", ".join(paper["authors"]))
+            lines.append("")
+            if paper["tldr"]:
+                lines.append(f"**TL;DR:** {paper['tldr']}")
+                lines.append("")
+            lines.append(f"**Relevance {match['relevance']:.2f}** — {match['reason']}")
+            lines.append("")
     return "\n".join(lines)
 
 

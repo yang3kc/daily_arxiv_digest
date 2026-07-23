@@ -68,6 +68,8 @@ def test_two_topics_uses_singular_noun():
     a_idx, b_idx = md.index(f"## {TOPIC_A}"), md.index(f"## {TOPIC_B}")
     a_note = md[a_idx:b_idx]
     assert _short_topic(TOPIC_B) in a_note and _short_topic(TOPIC_A) not in a_note
+    # The note sits right after the title, before the authors line.
+    assert a_note.index("Also matches") < a_note.index("Ada Lovelace")
 
 
 def test_three_topics_uses_plural_noun():
