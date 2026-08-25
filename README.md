@@ -186,7 +186,7 @@ The two modes are complementary and share nothing at runtime: the cron pipeline 
 
 # Dev
 
-Run a quick integration check (fetches one feed and scores one paper):
+Run a quick integration check (fetches one feed and scores one paper; needs `config.json` and an API key):
 
 ```sh
 uv run python test_llm.py
