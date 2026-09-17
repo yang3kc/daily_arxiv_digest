@@ -3,7 +3,7 @@
 Automatically generate a daily digest of interesting arXiv papers.
 
 Having trouble catching up with the new arXiv papers everyday?
-This tool fetches the latest arXiv papers, uses an LLM to rate their relevance to the topics of your interest, and writes a daily digest — a human-readable markdown file plus a machine-readable JSON file — so it can run unattended in a cron job or be driven by another agent.
+This tool fetches the latest arXiv papers, uses an LLM to rate their relevance to the topics of your interest, and writes a daily digest as machine-readable JSON, with an optional human-readable markdown rendering, so it can run unattended in a cron job or be driven by another agent.
 
 It comes in two forms:
 
@@ -50,12 +50,12 @@ uv run python main.py
 
 The digest is written to `digests/YYYY-MM-DD/`, with the date stamped into every filename so the files stay self-identifying when copied out of their folder:
 
-- `digest-YYYY-MM-DD.md` — human-readable digest, grouped by topic, with a TL;DR for each selected paper
 - `digest-YYYY-MM-DD.json` — structured record (metadata, stats, and selected papers with scores and TL;DRs) for programmatic consumption
 - `scores-YYYY-MM-DD.json` — raw relevance scores for every fetched paper against every topic, so you can re-filter at any threshold on the fly without re-scoring
+- `digest-YYYY-MM-DD.md` — the same digest grouped by topic and rendered for reading. Written only when you pass `--markdown`
 
 If the digest for the day already exists, the run exits cleanly without spending API calls; use `--force` to regenerate.
-Other flags: `--config <path>` to use another config file, `--date YYYY-MM-DD` to label the output folder (the arXiv feed always returns the latest announcement).
+Other flags: `--config <path>` to use another config file, `--date YYYY-MM-DD` to label the output folder (the arXiv feed always returns the latest announcement), `--markdown` to also write the markdown rendering.
 
 To re-render the digest at a different threshold without re-fetching or re-scoring:
 
@@ -63,7 +63,7 @@ To re-render the digest at a different threshold without re-fetching or re-scori
 uv run python main.py --rethreshold 0.9
 ```
 
-This rebuilds `digest-YYYY-MM-DD.md`/`digest-YYYY-MM-DD.json` from the saved `scores-YYYY-MM-DD.json`; TL;DRs are cached in `tldrs-YYYY-MM-DD.json`, so changing the threshold back and forth costs no API calls once a paper's TL;DR has been generated.
+This rebuilds `digest-YYYY-MM-DD.json` from the saved `scores-YYYY-MM-DD.json`, and `digest-YYYY-MM-DD.md` too when you add `--markdown`; TL;DRs are cached in `tldrs-YYYY-MM-DD.json`, so changing the threshold back and forth costs no API calls once a paper's TL;DR has been generated.
 
 The `digests/` folder is gitignored: digests are local artifacts meant to be read in place (by you or by an agent), not committed.
 

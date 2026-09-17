@@ -4,14 +4,15 @@ This file provides guidance to AI coding agents when working with code in this r
 
 ## Project Overview
 
-Daily arXiv Digest is a headless CLI tool that fetches papers from arXiv RSS feeds, uses an LLM to rate their relevance against user-defined topics, and writes a daily digest to `digests/YYYY-MM-DD/` as both markdown (for humans) and JSON (for agents). It is designed to run unattended in a cron job or be invoked by another agent.
+Daily arXiv Digest is a headless CLI tool that fetches papers from arXiv RSS feeds, uses an LLM to rate their relevance against user-defined topics, and writes a daily digest to `digests/YYYY-MM-DD/` as JSON. The markdown rendering for humans is opt-in with `--markdown`. It is designed to run unattended in a cron job or be invoked by another agent.
 
 ## Commands
 
 ### Development and Running
 - `make run` or `make all` - Generate today's digest
-- `uv run python main.py` - Direct command (flags: `--config`, `--date`, `--force`)
-- `uv run python main.py --rethreshold X` - Rebuild digest-<date>.md/digest-<date>.json from saved scores-<date>.json at threshold X (no fetch/re-score; TL;DRs cached in tldrs-<date>.json)
+- `uv run python main.py` - Direct command (flags: `--config`, `--date`, `--force`, `--markdown`)
+- `uv run python main.py --markdown` - Also write digest-<date>.md, the rendered digest
+- `uv run python main.py --rethreshold X` - Rebuild digest-<date>.json from saved scores-<date>.json at threshold X (no fetch/re-score; TL;DRs cached in tldrs-<date>.json)
 - `uv sync` - Install/update dependencies
 
 ### Testing
@@ -38,10 +39,10 @@ Daily arXiv Digest is a headless CLI tool that fetches papers from arXiv RSS fee
 2. Concurrently score every paper against every topic
 3. Select judgements with relevance ≥ `relevance_threshold`
 4. Generate one TL;DR per selected paper (a paper can match several topics)
-5. Write `digest-<date>.json` (selected papers), `digest-<date>.md` (rendered digest grouped by topic), and `scores-<date>.json` (raw scores for every fetched paper, for re-filtering at any threshold without re-scoring)
+5. Write `digest-<date>.json` (selected papers) and `scores-<date>.json` (raw scores for every fetched paper, for re-filtering at any threshold without re-scoring). With `--markdown`, also write `digest-<date>.md` (rendered digest grouped by topic)
 
 ### Output Contract
-All four output files live in `digests/<date>/` and stamp the date into their filenames (`digest-<date>.{json,md}`, `scores-<date>.json`, `tldrs-<date>.json`) so they stay self-identifying when copied out; `src.digest.output_paths(output_dir, date_str)` is the single source of truth for these names.
+The output files live in `digests/<date>/` and stamp the date into their filenames (`digest-<date>.{json,md}`, `scores-<date>.json`, `tldrs-<date>.json`) so they stay self-identifying when copied out; `src.digest.output_paths(output_dir, date_str)` is the single source of truth for these names.
 `digest-<date>.json` top-level: `date`, `generated_at`, `provider`, `model`, `relevance_threshold`, `arxiv_subjects`, `topics`, `stats {papers_fetched, papers_selected}`, `papers[]`.
 Each paper: `id`, `title`, `authors[]`, `url`, `abstract`, `tldr`, `matched_topics[] {topic, relevance, reason}` (only judgements ≥ threshold).
 `scores-<date>.json`: same metadata (no threshold/stats) with `papers[]` covering EVERY fetched paper; each has `judgements[] {topic, relevance, reason}` for ALL topics.
@@ -88,5 +89,5 @@ Cutting a release (all on `main`, after the feature branch has merged):
 
 ## Development Notes
 
-- The Streamlit UI was removed in the headless revamp; `digest-<date>.md` is the human-readable surface
+- The Streamlit UI was removed in the headless revamp; `digest-<date>.md` is the human-readable surface, written only when `--markdown` is passed. The scheduled runs do not pass it: the digest review page reads the JSON
 - `digests/` is gitignored — outputs are local artifacts consumed in place by humans/agents

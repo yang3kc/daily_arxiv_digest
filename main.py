@@ -16,7 +16,7 @@ load_dotenv()
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Generate a daily arXiv digest (digest-<date>.md + digest-<date>.json)."
+        description="Generate a daily arXiv digest (digest-<date>.json)."
     )
     parser.add_argument(
         "--config", default="config.json", help="Path to the config file"
@@ -33,10 +33,16 @@ def main():
         help="Regenerate even if the digest for this date already exists",
     )
     parser.add_argument(
+        "--markdown",
+        action="store_true",
+        help="Also write digest-<date>.md, the human-readable rendering; "
+        "off by default, the JSON files are always written",
+    )
+    parser.add_argument(
         "--rethreshold",
         type=float,
         metavar="X",
-        help="Rebuild digest-<date>.md/digest-<date>.json from the saved "
+        help="Rebuild digest-<date>.json from the saved "
         "scores-<date>.json at threshold X — no fetching or re-scoring; TL;DRs "
         "are only generated for papers newly above the threshold",
     )
@@ -63,14 +69,15 @@ def main():
 
     if args.rethreshold is not None:
         digest, json_path, md_path = rethreshold_digest(
-            config, args.date, output_dir, args.rethreshold
+            config, args.date, output_dir, args.rethreshold, markdown=args.markdown
         )
         stats = digest["stats"]
         print(
             f"Re-thresholded at {args.rethreshold}: "
             f"{stats['papers_selected']} of {stats['papers_fetched']} papers."
         )
-        print(f"Rewrote {json_path} and {md_path}")
+        written = [str(json_path)] + ([str(md_path)] if md_path else [])
+        print(f"Rewrote {' and '.join(written)}")
         return 0
 
     paths = output_paths(output_dir, args.date)
@@ -79,12 +86,15 @@ def main():
         print(f"Digest for {args.date} already exists at {json_path}; use --force to regenerate.")
         return 0
 
-    digest, json_path, md_path = run_digest(config, args.date, output_dir)
+    digest, json_path, md_path = run_digest(
+        config, args.date, output_dir, markdown=args.markdown
+    )
     stats = digest["stats"]
     print(
         f"Selected {stats['papers_selected']} of {stats['papers_fetched']} papers."
     )
-    print(f"Wrote {json_path}, {md_path}, and {paths['scores']}")
+    written = [str(json_path)] + ([str(md_path)] if md_path else []) + [str(paths["scores"])]
+    print(f"Wrote {', '.join(written[:-1])}, and {written[-1]}")
     return 0
 
 

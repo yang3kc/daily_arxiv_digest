@@ -18,6 +18,7 @@ from src.digest import (
     _topic_labels,
     output_paths,
     render_markdown,
+    write_outputs,
 )
 from src.llm import LLMPaperReader
 
@@ -192,6 +193,24 @@ def test_load_tldr_cache_tolerates_malformed_files():
         # Non-string values are dropped; valid string entries survive.
         cache_path.write_text(json.dumps({"p1": "ok", "p2": 5, "p3": None}))
         assert _load_tldr_cache(out, "2026-07-22") == {"p1": "ok"}
+
+
+def test_write_outputs_makes_markdown_opt_in():
+    digest = _digest([_paper("solo", [(TOPIC_A, 0.9)])], [TOPIC_A])
+    scores = {"date": "2026-07-22", "papers": []}
+    with tempfile.TemporaryDirectory() as d:
+        out = Path(d)
+        paths = output_paths(out, "2026-07-22")
+        json_path, md_path = write_outputs(digest, scores, out, "2026-07-22")
+        assert json_path.exists() and paths["scores"].exists()
+        assert md_path is None
+        assert not paths["md"].exists()
+
+        json_path, md_path = write_outputs(
+            digest, scores, out, "2026-07-22", markdown=True
+        )
+        assert md_path == paths["md"]
+        assert paths["md"].exists()
 
 
 if __name__ == "__main__":
